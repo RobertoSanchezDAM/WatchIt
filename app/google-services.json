@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "172324266033",
+    "project_id": "watchit-6d82a",
+    "storage_bucket": "watchit-6d82a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172324266033:android:f70624757b07c200913510",
+        "android_client_info": {
+          "package_name": "com.example.robertosanchez.watchit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172324266033-gti4tvr4boa80vq0gnef8i9v9mnddr9i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.robertosanchez.watchit",
+            "certificate_hash": "19df6f3ed6b90bd5c8d5741e4eaedee6eb4ca8b8"
+          }
+        },
+        {
+          "client_id": "172324266033-tkl1htlcdd33eq2to0oho1mv48e8ll19.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZzC1K4GrqataRKcjtgPqs61zjNNyCzlo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172324266033-tkl1htlcdd33eq2to0oho1mv48e8ll19.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
