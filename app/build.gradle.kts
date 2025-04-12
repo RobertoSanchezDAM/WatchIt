@@ -80,4 +80,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
+
+    implementation ("androidx.core:core-splashscreen:1.0.0")
+
 }
