@@ -36,8 +36,7 @@ fun Navegacion(auth: AuthManager) {
                         popUpTo(Login) { inclusive = true }
                     }
                 },
-                { navController.navigate(ContraseñaOlv) },
-                { navController.popBackStack() }
+                { navController.navigate(ContraseñaOlv) }
             )
         }
 

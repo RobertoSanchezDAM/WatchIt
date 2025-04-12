@@ -11,14 +11,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -66,7 +69,6 @@ fun LoginScreen(
     navigateToSignUp: () -> Unit,
     navigateToUsuario: () -> Unit,
     navigateToContraseñaOlv: () -> Unit,
-    onBack: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -110,18 +112,6 @@ fun LoginScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .zIndex(1f)
-        ) {
-            Icon(
-                Icons.Filled.ArrowBack,
-                contentDescription = "Atrás",
-                tint = Color.White
-            )
-        }
         // Imagen de fondo
         Image(
             painter = painterResource(id = R.drawable.pxfuel),
@@ -132,117 +122,183 @@ fun LoginScreen(
 
         // Contenido de la pantalla
         Column(
-            modifier = Modifier.fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.8f)),
-            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF191B1F)),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Firebase",
-                modifier = Modifier.size(120.dp)
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Correo") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            TextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Contraseña") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Button(
-                onClick = {
-                    scope.launch {
-                        signIn(email, password, context, auth, navigateToUsuario)
-                    }
-                },
-                shape = RoundedCornerShape(50),
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 40.dp)
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1ED760)
-                )
+                    .height(250.dp)
             ) {
-                Text(
-                    text = "Iniciar Sesión".uppercase(),
-                    color = Color.Black,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
+                Image(
+                    painter = painterResource(id = R.drawable.pxfuel),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+                
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(0x88000000))
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Text(
-                text = "¿Olvidaste tu contraseña?",
-                modifier = Modifier.clickable { navigateToContraseñaOlv() },
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily.Default,
-                    textDecoration = TextDecoration.Underline,
-                    color = Color.Gray
+            Box(
+                modifier = Modifier
+                    .offset(y = (-50).dp)
+                    .size(120.dp)
+                    .background(Color(0xFF191B1F), shape = CircleShape)
+                    .padding(20.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Logo",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
                 )
-            )
+            }
 
-            Spacer(modifier = Modifier.height(25.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp)
+                    .offset(y = (-32).dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            Text(text = "-------- o --------", style = TextStyle(color = Color.Gray))
-
-            Spacer(modifier = Modifier.height(25.dp))
-
-            SocialMediaButton(
-                onClick = {
-                    scope.launch {
-                        signAnonimous(auth, navigateToUsuario, context)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Button(
+                        onClick = {
+                            auth.signInWithGoogle(googleSignLauncher)
+                        },
+                        modifier = Modifier.size(width = 40.dp, height = 40.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF272B30)
+                        ),
+                        shape = RoundedCornerShape(75.dp),
+                        contentPadding = PaddingValues(8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_google),
+                            contentDescription = "Google",
+                            modifier = Modifier.size(25.dp),
+                            tint = Color.Unspecified
+                        )
                     }
-                },
-                text = "Continuar como invitado",
-                icon = R.drawable.ic_incognito,
-                color = Color(0xFF363636)
-            )
 
-            Spacer(modifier = Modifier.height(15.dp))
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                signAnonimous(auth, navigateToUsuario, context)
+                            }
+                        },
+                        modifier = Modifier.size(width = 40.dp, height = 40.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF272B30)
+                        ),
+                        shape = RoundedCornerShape(75.dp),
+                        contentPadding = PaddingValues(8.dp)
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_incognito),
+                                contentDescription = "Anónimo",
+                                modifier = Modifier.size(25.dp),
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
 
-            SocialMediaButton(
-                onClick = {
-                    auth.signInWithGoogle(googleSignLauncher)
-                },
-                text = "Continuar con Google",
-                icon = R.drawable.ic_google,
-                color = Color(0xFFF1F1F1)
-            )
+                Spacer(modifier = Modifier.height(24.dp))
+
+                TextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    shape = RoundedCornerShape(5.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    shape = RoundedCornerShape(5.dp)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "¿Has olvidado la contraseña?",
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .clickable { navigateToContraseñaOlv() },
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = Color(0xFF3B82F6)
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = {
+                        scope.launch {
+                            signIn(email, password, context, auth, navigateToUsuario)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF3B82F6)
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "INICIAR SESIÓN",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "¿No tienes cuenta? ",
+                        color = Color.Gray
+                    )
+                    Text(
+                        text = "Registrate",
+                        color = Color(0xFF3B82F6),
+                        modifier = Modifier.clickable { navigateToSignUp() },
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
 
-        // Texto de registro al final
-        Text(
-            text = "¿No tienes cuenta? Regístrate",
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 40.dp)
-                .clickable { navigateToSignUp() },
-            style = TextStyle(
-                color = Color.Gray,
-                fontSize = 14.sp,
-                fontFamily = FontFamily.Default,
-                textDecoration = TextDecoration.Underline
-            )
-        )
     }
 }
 
