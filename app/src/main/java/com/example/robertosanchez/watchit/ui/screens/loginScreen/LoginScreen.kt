@@ -193,6 +193,8 @@ fun LoginScreen(
                         )
                     }
 
+                    Spacer(modifier = Modifier.width(12.dp))
+
                     Button(
                         onClick = {
                             scope.launch {
