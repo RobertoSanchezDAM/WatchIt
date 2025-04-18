@@ -12,6 +12,7 @@ import com.example.robertosanchez.proyectoapi.ui.screens.contrasenaOlvScreen.Con
 import com.example.robertosanchez.proyectoapi.ui.screens.inicioScreen.InicioScreen
 import com.example.robertosanchez.proyectoapi.ui.screens.loginScreen.LoginScreen
 import com.example.robertosanchez.proyectoapi.ui.screens.registroScreen.RegistroScreen
+import com.example.robertosanchez.watchit.ui.screens.principalScreen.PrincipalScreen
 
 
 @Composable
@@ -32,7 +33,7 @@ fun Navegacion(auth: AuthManager) {
                 auth,
                 { navController.navigate(Registro) },
                 {
-                    navController.navigate(Usuario) {
+                    navController.navigate(Principal) {
                         popUpTo(Login) { inclusive = true }
                     }
                 },
@@ -50,6 +51,13 @@ fun Navegacion(auth: AuthManager) {
             ContrasenaOlvScreen(
                 auth,
                 { navController.navigate(Login) }
+            )
+        }
+
+        composable<Principal> {
+            PrincipalScreen(
+                auth = auth,
+                navigateToLogin = { navController.navigate(Login) }
             )
         }
     }

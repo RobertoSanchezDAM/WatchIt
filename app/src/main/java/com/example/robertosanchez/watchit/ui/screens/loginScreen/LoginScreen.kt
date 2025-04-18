@@ -67,7 +67,7 @@ import kotlinx.coroutines.withContext
 fun LoginScreen(
     auth: AuthManager,
     navigateToSignUp: () -> Unit,
-    navigateToUsuario: () -> Unit,
+    navigateToPrincipal: () -> Unit,
     navigateToContraseñaOlv: () -> Unit,
 ) {
     var email by remember { mutableStateOf("") }
@@ -92,7 +92,7 @@ fun LoginScreen(
                                 "Inicio de sesión correcto",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            navigateToUsuario()
+                            navigateToPrincipal()
                         }
 
                         is AuthRes.Error -> {
@@ -196,7 +196,7 @@ fun LoginScreen(
                     Button(
                         onClick = {
                             scope.launch {
-                                signAnonimous(auth, navigateToUsuario, context)
+                                signAnonimous(auth, navigateToPrincipal, context)
                             }
                         },
                         modifier = Modifier.size(width = 40.dp, height = 40.dp),
@@ -261,7 +261,7 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         scope.launch {
-                            signIn(email, password, context, auth, navigateToUsuario)
+                            signIn(email, password, context, auth, navigateToPrincipal)
                         }
                     },
                     modifier = Modifier
@@ -303,14 +303,14 @@ fun LoginScreen(
 }
 
 
-suspend fun signAnonimous(auth: AuthManager, navigateToHome: () -> Unit, context: Context) {
+suspend fun signAnonimous(auth: AuthManager, navigateToPrincipal: () -> Unit, context: Context) {
     val res = withContext(Dispatchers.IO) {
         auth.signInAnonymously()
     }
     when (res) {
         is AuthRes.Success -> {
             Toast.makeText(context, "Inicio de sesión correcto", Toast.LENGTH_SHORT).show()
-            navigateToHome()
+            navigateToPrincipal()
         }
         is AuthRes.Error -> {
             Toast.makeText(context, res.errorMessage, Toast.LENGTH_SHORT).show()
@@ -318,7 +318,7 @@ suspend fun signAnonimous(auth: AuthManager, navigateToHome: () -> Unit, context
     }
 }
 
-suspend fun signIn(email: String, password: String, context: Context, auth: AuthManager, navigateToHome: () -> Unit) {
+suspend fun signIn(email: String, password: String, context: Context, auth: AuthManager, navigateToPrincipal: () -> Unit) {
     if (email.isNotEmpty() && password.isNotEmpty()) {
         val result =
             withContext(Dispatchers.IO) {
@@ -327,7 +327,7 @@ suspend fun signIn(email: String, password: String, context: Context, auth: Auth
             when (result) {
                 is AuthRes.Success -> {
                     Toast.makeText(context, "Inicio de sesión correcto", Toast.LENGTH_SHORT).show()
-                    navigateToHome()
+                    navigateToPrincipal()
                 }
                 is AuthRes.Error -> {
                     Toast.makeText(context, result.errorMessage, Toast.LENGTH_SHORT).show()

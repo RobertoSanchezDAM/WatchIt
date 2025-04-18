@@ -9,7 +9,7 @@ object Inicio
 object Login
 
 @Serializable
-object Usuario
+object Principal
 
 @Serializable
 object ContraseñaOlv
