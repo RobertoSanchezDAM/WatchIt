@@ -1,27 +1,46 @@
 package com.example.robertosanchez.watchit.ui.screens.principalScreen
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
 import com.example.robertosanchez.proyectoapi.data.AuthManager
+import com.example.robertosanchez.watchit.data.model.Peliculas
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrincipalScreen(auth: AuthManager, navigateToLogin: () -> Unit) {
+fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
+                    ratedViewModel: PeliculasRatedViewModel,
+                    auth: AuthManager,
+                    navigateToLogin: () -> Unit) {
     var showDialog by remember { mutableStateOf<DialogType?>(null) }
     val navController = rememberNavController()
-    val user = auth.getCurrentUser()
+
+    val lista_populares by popularesViewModel.lista.observeAsState(emptyList())
+    val progressBar_populares by popularesViewModel.progressBar.observeAsState(false)
+
+    val lista_rated by ratedViewModel.lista.observeAsState(emptyList())
+    val progressBar_rated by ratedViewModel.progressBar.observeAsState(false)
 
     Scaffold(
         bottomBar = {
@@ -37,7 +56,61 @@ fun PrincipalScreen(auth: AuthManager, navigateToLogin: () -> Unit) {
                 startDestination = BottomNavItem.Home.route
             ) {
                 composable(BottomNavItem.Home.route) {
-                    PrincipalContenido()
+                    // Peliculas Populares
+                    if (progressBar_populares) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        if (lista_populares!!.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("No hay elementos", style = MaterialTheme.typography.bodySmall)
+                            }
+                        } else {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(lista_populares!!) { pelicula ->
+                                    PeliculasListItem(pelicula)
+                                }
+                            }
+                        }
+                    }
+
+                    // Peliculas Rated
+                    if (progressBar_rated) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        if (lista_rated!!.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("No hay elementos", style = MaterialTheme.typography.bodySmall)
+                            }
+                        } else {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(lista_rated!!) { pelicula ->
+                                    PeliculasListItem(pelicula)
+                                }
+                            }
+                        }
+                    }
                 }
                 composable(BottomNavItem.Search.route) {
                     /*SearchContent()*/
@@ -66,53 +139,6 @@ fun PrincipalScreen(auth: AuthManager, navigateToLogin: () -> Unit) {
     }
 }
 
-@Composable
-fun PrincipalContenido() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF272B30)),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Pantalla de Inicio.", color = Color.White)
-    }
-}
-
-/*@Composable
-fun SearchContent() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF191B1F)),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Pantalla de Búsqueda", color = Color.White)
-    }
-}
-
-@Composable
-fun WatchlistContent() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF191B1F)),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Mi Lista", color = Color.White)
-    }
-}
-
-@Composable
-fun ProfileContent() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF191B1F)),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Perfil", color = Color.White)
-    }
-}*/
 
 // Enum para los tipos de diálogos
 enum class DialogType {
@@ -143,4 +169,40 @@ fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
             }
         }
     )
+}
+
+@Composable
+private fun PeliculasListItem(pelicula: Peliculas) {
+    Column(
+        modifier = Modifier
+            .width(200.dp)
+            .padding(2.dp)
+            .clickable { /**/ },
+        horizontalAlignment = Alignment.CenterHorizontally,
+
+        ) {
+        Imagen(item = pelicula)
+    }
+}
+
+@Composable
+fun Imagen(item: Peliculas, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(200.dp)
+    ) {
+
+        Image(
+            painter = rememberAsyncImagePainter(
+                model = item.poster,
+                imageLoader = ImageLoader.Builder(context).crossfade(true).build()
+            ),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
 }

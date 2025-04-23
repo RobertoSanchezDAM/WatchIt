@@ -2,17 +2,17 @@ package com.example.robertosanchez.watchit.ui.navegacion
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.example.robertosanchez.proyectoapi.data.AuthManager
 import com.example.robertosanchez.proyectoapi.ui.screens.contrasenaOlvScreen.ContrasenaOlvScreen
 import com.example.robertosanchez.proyectoapi.ui.screens.inicioScreen.InicioScreen
 import com.example.robertosanchez.proyectoapi.ui.screens.loginScreen.LoginScreen
 import com.example.robertosanchez.proyectoapi.ui.screens.registroScreen.RegistroScreen
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PrincipalScreen
+import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasPopularesViewModel
+import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasRatedViewModel
 
 
 @Composable
@@ -55,7 +55,11 @@ fun Navegacion(auth: AuthManager) {
         }
 
         composable<Principal> {
+            val popularesViewModel = PeliculasPopularesViewModel()
+            val ratedViewModel = PeliculasRatedViewModel()
             PrincipalScreen(
+                popularesViewModel = popularesViewModel,
+                ratedViewModel = ratedViewModel,
                 auth = auth,
                 navigateToLogin = { navController.navigate(Login) }
             )
