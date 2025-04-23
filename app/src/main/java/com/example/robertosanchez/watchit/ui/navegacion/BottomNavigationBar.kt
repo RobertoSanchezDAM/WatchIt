@@ -53,7 +53,7 @@ fun BottomNavigationBar(
         ) {
             // Elementos de la izquierda
             Row(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(0.2f),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 NavigationItem(
@@ -92,7 +92,7 @@ fun BottomNavigationBar(
 
             // Elementos de la derecha
             Row(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(0.2f),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 NavigationItem(
