@@ -22,7 +22,12 @@ class PeliculasPopularesViewModel: ViewModel() {
             _lista.value = movies.results.map {
                 Peliculas(
                     it.id,
-                    "https://image.tmdb.org/t/p/w185" + it.poster_path
+                    "https://image.tmdb.org/t/p/w185" + it.poster_path,
+                    it.release_date,
+                    it.title,
+                    it.overview,
+                    "https://image.tmdb.org/t/p/w185" + it.backdrop_path,
+                    it.genre_ids
                 )
             }
             _progressBar.value = false

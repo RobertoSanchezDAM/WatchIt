@@ -18,15 +18,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
@@ -41,6 +37,8 @@ import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.model.Peliculas
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
+import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
+import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +46,8 @@ import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
 fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     ratedViewModel: PeliculasRatedViewModel,
                     auth: AuthManager,
-                    navigateToLogin: () -> Unit) {
+                    navigateToLogin: () -> Unit,
+                    navigateToDetail: (Int) -> Unit) {
     val user = auth.getCurrentUser()
 
     var showDialog by remember { mutableStateOf<DialogType?>(null) }
@@ -165,7 +164,7 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                                 .fillMaxSize()
                                 .padding(top = 120.dp, bottom = 26.dp)
                         ) {
-                            // Popular Movies Section
+                            // Peliculas Populares
                             Text(
                                 text = "Peliculas Populares esta Semana",
                                 fontSize = 20.sp,
@@ -194,7 +193,7 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
                                         items(lista_populares!!) { pelicula ->
-                                            PeliculasListItem(pelicula)
+                                            PeliculasListItem(pelicula, navigateToDetail)
                                         }
                                     }
                                 }
@@ -202,7 +201,7 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
 
                             Spacer(modifier = Modifier.height(24.dp))
 
-                            // Top Rated Movies Section
+                            // Peliculas mejor Valoradas
                             Text(
                                 text = "Peliculas mejor Valoradas",
                                 fontSize = 20.sp,
@@ -231,7 +230,7 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
                                         items(lista_rated!!) { pelicula ->
-                                            PeliculasListItem(pelicula)
+                                            PeliculasListItem(pelicula, navigateToDetail)
                                         }
                                     }
                                 }
@@ -266,7 +265,6 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
     }
 }
 
-
 // Enum para los tipos de diálogos
 enum class DialogType {
     Logout
@@ -299,12 +297,12 @@ fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
 }
 
 @Composable
-private fun PeliculasListItem(pelicula: Peliculas) {
+private fun PeliculasListItem(pelicula: Peliculas, navigateToDetail: (Int) -> Unit) {
     Box(
         modifier = Modifier
             .width(140.dp)
             .height(200.dp)
-            .clickable { /**/ }
+            .clickable { navigateToDetail(pelicula.id) }
             .border(
                 width = 2.dp,
                 color = Color.Gray.copy(alpha = 0.7f)
@@ -329,50 +327,4 @@ fun Imagen(item: Peliculas, modifier: Modifier = Modifier) {
             .then(modifier),
         contentScale = ContentScale.Crop
     )
-}
-
-// Borde superior (TopAppBar)
-class CustomShape : Shape {
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density
-    ): Outline {
-        val path = Path().apply {
-            moveTo(0f, 0f)
-            lineTo(size.width, 0f)
-            lineTo(size.width, size.height)
-            quadraticBezierTo(
-                size.width / 2,
-                size.height - 60f,
-                0f,
-                size.height
-            )
-            close()
-        }
-        return Outline.Generic(path)
-    }
-}
-
-// Borde inferior (BottomNavigationBar)
-class BottomBarCustomShape : Shape {
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density
-    ): Outline {
-        val path = Path().apply {
-            moveTo(0f, size.height)
-            lineTo(size.width, size.height)
-            lineTo(size.width, 0f)
-            quadraticBezierTo(
-                size.width / 2,
-                60f,
-                0f,
-                0f
-            )
-            close()
-        }
-        return Outline.Generic(path)
-    }
 }

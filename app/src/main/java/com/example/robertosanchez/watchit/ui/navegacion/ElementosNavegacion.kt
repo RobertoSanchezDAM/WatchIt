@@ -9,10 +9,13 @@ object Inicio
 object Login
 
 @Serializable
-object Principal
-
-@Serializable
 object ContraseñaOlv
 
 @Serializable
 object Registro
+
+@Serializable
+object Principal
+
+@Serializable
+data class Detail(val id: Int)

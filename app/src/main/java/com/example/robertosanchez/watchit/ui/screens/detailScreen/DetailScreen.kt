@@ -1,0 +1,361 @@
+package com.example.robertosanchez.watchit.ui.screens.detailScreen
+
+import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasPopularesViewModel
+import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasRatedViewModel
+import com.example.robertosanchez.watchit.ui.shapes.CustomShape
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
+import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
+import androidx.navigation.compose.rememberNavController
+import com.example.robertosanchez.watchit.ui.navegacion.Principal
+import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
+import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DetailScreen(
+    id: Int,
+    popularesViewModel: PeliculasPopularesViewModel,
+    ratedViewModel: PeliculasRatedViewModel,
+    navController: NavController
+) {
+    var showDialog by remember { mutableStateOf<DialogType?>(null) }
+
+    val listaPopulares by popularesViewModel.lista.observeAsState(emptyList())
+    val listaRated by ratedViewModel.lista.observeAsState(emptyList())
+
+    val creditsViewModel: DetailCreditsViewModel = viewModel()
+    val credits by creditsViewModel.credits.observeAsState()
+
+    val imagesViewModel: DetailImagesViewModel = viewModel()
+    val images by imagesViewModel.images.observeAsState()
+
+    val genreMap = mapOf(
+        28 to "Acción",
+        12 to "Aventura",
+        16 to "Animación",
+        35 to "Comedia",
+        80 to "Crimen",
+        99 to "Documental",
+        18 to "Drama",
+        10751 to "Familia",
+        14 to "Fantasía",
+        36 to "Historia",
+        27 to "Terror",
+        10402 to "Música",
+        9648 to "Misterio",
+        10749 to "Romance",
+        878 to "Ciencia ficción",
+        10770 to "TV Movie",
+        53 to "Thriller",
+        10752 to "Bélica",
+        37 to "Western"
+    )
+
+    LaunchedEffect(id) {
+        creditsViewModel.fetchCredits(id)
+        imagesViewModel.fetchImages(id)
+    }
+
+    Log.d("Id", "${id}")
+    
+    val pelicula = remember(id) {
+        listaPopulares.find { it.id == id } ?: listaRated.find { it.id == id }
+    }
+
+    val genreIds = pelicula?.genre_ids ?: emptyList()
+    val genreNames = genreIds.mapNotNull { genreMap[it] }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(
+                    text = "Detalles de la Película",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.Black.copy(alpha = 0.8f),
+                    modifier = Modifier.padding(top = 8.dp)
+                ) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF3B82F6),
+                    titleContentColor = Color.White
+                ),
+                modifier = Modifier
+                    .height(56.dp)
+                    .clip(CustomShape())
+            )
+        },
+        bottomBar = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(BottomBarCustomShape())
+                        .background(Color(0xFF3B82F6))
+                ) {
+                    BottomNavigationBar(
+                        navController = navController,
+                        onLogoutClick = { showDialog = DialogType.Logout }
+                    )
+                }
+                // Botón flotante de inicio
+                Box(
+                    modifier = Modifier
+                        .offset(y = (-25).dp)
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF2196F3))
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    IconButton(
+                        onClick = { navController.navigate( Principal) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = "Inicio",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+            }
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .background(Color(0xFF1E1E1E))
+        ) {
+            pelicula?.let { movie ->
+                Box(modifier = Modifier.fillMaxSize()) {
+                    // Fondo: backdrop o póster si no hay
+                    val backdropPath = images?.backdrops?.maxByOrNull { it.width ?: 0 }?.file_path
+                        ?: images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path
+                        ?: movie.poster
+                    Image(
+                        painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original" + backdropPath),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(350.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(340.dp)
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Black.copy(alpha = 0.7f),
+                                        Color.Transparent,
+                                        Color(0xFF1E1E1E)
+                                    ),
+                                    startY = 0f,
+                                    endY = 625f
+                                )
+                            )
+                    )
+                    // Contenido principal
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 220.dp)
+                            .background(Color(0xFF1E1E1E))
+                            .padding(16.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Póster
+                            val posterPath = images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path ?: movie.poster
+                            Image(
+                                painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original" + posterPath),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .width(110.dp)
+                                    .height(150.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            // Info principal
+                            Column {
+                                Text(movie.title, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                                credits?.let { cr ->
+                                    val director = cr.crew.find { it.job == "Director" }
+                                    director?.let {
+                                        Text("Directed by ${it.name}", color = Color.LightGray, fontSize = 16.sp)
+                                    }
+                                }
+                                Text("2025 • 138 mins", color = Color.LightGray, fontSize = 14.sp) // Sustituye por los datos reales si los tienes
+                                Spacer(modifier = Modifier.height(8.dp))
+                                if (genreNames.isNotEmpty()) {
+                                    Text(
+                                        text = genreNames.joinToString(", "),
+                                        color = Color.LightGray,
+                                        fontSize = 12.sp,
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        // Sinopsis con botón "Leer mas"
+                        var expanded by remember { mutableStateOf(false) }
+                        Text(
+                            text = "Sinopsis",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        val sinopsisText = movie.sinopsis ?: "Sinopsis no disponible."
+                        val maxLines = if (expanded) Int.MAX_VALUE else 3
+                        Text(
+                            text = sinopsisText,
+                            color = Color.White,
+                            maxLines = maxLines,
+                            fontSize = 16.sp
+                        )
+                        if (!expanded && sinopsisText.length > 120) {
+                            TextButton(onClick = { expanded = true }) {
+                                Text("Leer más", color = Color.Gray)
+                            }
+                        }
+                        if (expanded && sinopsisText.length > 120) {
+                            TextButton(onClick = { expanded = false }) {
+                                Text("Leer menos", color = Color.Gray)
+                            }
+                        }
+                        // Cast principal
+                        credits?.cast?.take(10)?.let { castList ->
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Reparto principal",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                castList.forEach { actor ->
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        modifier = Modifier.width(60.dp)
+                                    ) {
+                                        val profileUrl = actor.profile_path?.let { "https://image.tmdb.org/t/p/w185$it" }
+                                        if (profileUrl != null) {
+                                            Image(
+                                                painter = rememberAsyncImagePainter(profileUrl),
+                                                contentDescription = actor.name,
+                                                modifier = Modifier
+                                                    .size(48.dp)
+                                                    .clip(CircleShape),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                        } else {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(48.dp)
+                                                    .clip(CircleShape)
+                                                    .background(Color.Gray),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = actor.name,
+                                                    color = Color.White,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                        Text(
+                                            text = actor.name,
+                                            color = Color.White,
+                                            fontSize = 12.sp,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            maxLines = 2,
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                        )
+                                        Spacer(modifier = Modifier.height(10.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } ?: run {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Película no encontrada",
+                        color = Color.White,
+                        fontSize = 20.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+// Enum para los tipos de diálogos
+enum class DialogType {
+    Logout
+}
+
+@Composable
+fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF2196F3),
+        title = { Text("Cerrar Sesión", color = Color.Black) },
+        text = { Text("¿Estás seguro de que deseas cerrar sesión?", color = Color.Black) },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E1E1E))
+            ) {
+                Text("Aceptar", color = Color.White)
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E1E1E))
+            ) {
+                Text("Cancelar", color = Color.White)
+            }
+        }
+    )
+}
