@@ -1,5 +1,6 @@
 package com.example.robertosanchez.watchit.ui.screens.detailScreen
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasPopularesViewModel
@@ -35,6 +37,7 @@ import com.example.robertosanchez.watchit.ui.navegacion.Principal
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
@@ -54,7 +57,7 @@ fun DetailScreen(
     val imagesViewModel: DetailImagesViewModel = viewModel()
     val images by imagesViewModel.images.observeAsState()
 
-    val genreMap = mapOf(
+    val generos = mapOf(
         28 to "Acción",
         12 to "Aventura",
         16 to "Animación",
@@ -80,15 +83,13 @@ fun DetailScreen(
         creditsViewModel.fetchCredits(id)
         imagesViewModel.fetchImages(id)
     }
-
-    Log.d("Id", "${id}")
     
     val pelicula = remember(id) {
         listaPopulares.find { it.id == id } ?: listaRated.find { it.id == id }
     }
 
-    val genreIds = pelicula?.genre_ids ?: emptyList()
-    val genreNames = genreIds.mapNotNull { genreMap[it] }
+    val generosId = pelicula?.genre_ids ?: emptyList()
+    val generosNombre = generosId.mapNotNull { generos[it] }
 
     Scaffold(
         topBar = {
@@ -148,20 +149,18 @@ fun DetailScreen(
                 }
             }
         }
-    ) { paddingValues ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .background(Color(0xFF1E1E1E))
         ) {
-            pelicula?.let { movie ->
+            pelicula?.let { pelicula ->
                 Box(modifier = Modifier.fillMaxSize()) {
                     // Fondo: backdrop o póster si no hay
                     val backdropPath = images?.backdrops?.maxByOrNull { it.width ?: 0 }?.file_path
                         ?: images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path
-                        ?: movie.poster
+                        ?: pelicula.poster
                     Image(
                         painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original" + backdropPath),
                         contentDescription = null,
@@ -196,7 +195,7 @@ fun DetailScreen(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             // Póster
-                            val posterPath = images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path ?: movie.poster
+                            val posterPath = images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path ?: pelicula.poster
                             Image(
                                 painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original" + posterPath),
                                 contentDescription = null,
@@ -208,18 +207,18 @@ fun DetailScreen(
                             Spacer(modifier = Modifier.width(16.dp))
                             // Info principal
                             Column {
-                                Text(movie.title, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                                Text(pelicula.title, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
                                 credits?.let { cr ->
                                     val director = cr.crew.find { it.job == "Director" }
                                     director?.let {
-                                        Text("Directed by ${it.name}", color = Color.LightGray, fontSize = 16.sp)
+                                        Text("Dirigido por ${it.name}", color = Color.LightGray, fontSize = 16.sp)
                                     }
                                 }
-                                Text("2025 • 138 mins", color = Color.LightGray, fontSize = 14.sp) // Sustituye por los datos reales si los tienes
+                                Text(pelicula.release_date, color = Color.LightGray, fontSize = 14.sp)
                                 Spacer(modifier = Modifier.height(8.dp))
-                                if (genreNames.isNotEmpty()) {
+                                if (generosNombre.isNotEmpty()) {
                                     Text(
-                                        text = genreNames.joinToString(", "),
+                                        text = generosNombre.joinToString(", "),
                                         color = Color.LightGray,
                                         fontSize = 12.sp,
                                     )
@@ -228,7 +227,7 @@ fun DetailScreen(
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         // Sinopsis con botón "Leer mas"
-                        var expanded by remember { mutableStateOf(false) }
+                        var expandir by remember { mutableStateOf(false) }
                         Text(
                             text = "Sinopsis",
                             color = Color.White,
@@ -236,21 +235,29 @@ fun DetailScreen(
                             fontSize = 18.sp,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
-                        val sinopsisText = movie.sinopsis ?: "Sinopsis no disponible."
-                        val maxLines = if (expanded) Int.MAX_VALUE else 3
+                        val sinopsis = pelicula.sinopsis ?: "Sinopsis no disponible."
+                        val maxLineas = if (expandir) Int.MAX_VALUE else 3
                         Text(
-                            text = sinopsisText,
+                            text = sinopsis,
                             color = Color.White,
-                            maxLines = maxLines,
+                            maxLines = maxLineas,
                             fontSize = 16.sp
                         )
-                        if (!expanded && sinopsisText.length > 120) {
-                            TextButton(onClick = { expanded = true }) {
+                        if (!expandir && sinopsis.length > 120) {
+                            TextButton(
+                                onClick = { expandir = true },
+                                modifier = Modifier.padding(0.dp),
+                                contentPadding = PaddingValues(0.dp)
+                            ) {
                                 Text("Leer más", color = Color.Gray)
                             }
                         }
-                        if (expanded && sinopsisText.length > 120) {
-                            TextButton(onClick = { expanded = false }) {
+                        if (expandir && sinopsis.length > 120) {
+                            TextButton(
+                                onClick = { expandir = false },
+                                modifier = Modifier.padding(0.dp),
+                                contentPadding = PaddingValues(0.dp)
+                            ) {
                                 Text("Leer menos", color = Color.Gray)
                             }
                         }
@@ -304,9 +311,10 @@ fun DetailScreen(
                                             fontSize = 12.sp,
                                             modifier = Modifier.fillMaxWidth(),
                                             maxLines = 2,
-                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                            lineHeight = 1.5.em
                                         )
-                                        Spacer(modifier = Modifier.height(10.dp))
+                                        Spacer(modifier = Modifier.height(100.dp))
                                     }
                                 }
                             }
