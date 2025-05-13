@@ -18,19 +18,24 @@ class PeliculasRatedViewModel: ViewModel() {
     init {
         _progressBar.value = true
         viewModelScope.launch() {
-            val movies = RemoteConnection.service.ratedMovies("49336a7ff05331f9880d3bc4f792f260")
-            _lista.value = movies.results.map {
-                Peliculas(
-                    it.id,
-                    "https://image.tmdb.org/t/p/w185" + it.poster_path,
-                    it.release_date,
-                    it.title,
-                    it.overview,
-                    "https://image.tmdb.org/t/p/w185" + it.backdrop_path,
-                    it.genre_ids
-                )
+            try {
+                val movies = RemoteConnection.service.ratedMovies("49336a7ff05331f9880d3bc4f792f260")
+                _lista.value = movies.results.take(10).map {
+                    Peliculas(
+                        it.id,
+                        "https://image.tmdb.org/t/p/w185" + it.poster_path,
+                        it.release_date,
+                        it.title,
+                        it.overview,
+                        "https://image.tmdb.org/t/w185" + it.backdrop_path,
+                        it.genre_ids
+                    )
+                }
+            } catch (e: Exception) {
+                _lista.value = _lista.value ?: emptyList()
+            } finally {
+                _progressBar.value = false
             }
-            _progressBar.value = false
         }
     }
 }
