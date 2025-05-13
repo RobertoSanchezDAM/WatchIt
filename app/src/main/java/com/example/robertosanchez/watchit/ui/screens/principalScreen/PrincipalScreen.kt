@@ -195,6 +195,26 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                                         items(lista_populares!!) { pelicula ->
                                             PeliculasListItem(pelicula, navigateToDetail)
                                         }
+                                        item {
+                                            Box(
+                                                modifier = Modifier
+                                                    .width(140.dp)
+                                                    .height(200.dp)
+                                                    .background(Color.Gray.copy(alpha = 0.3f))
+                                                    .border(
+                                                        width = 2.dp,
+                                                        color = Color.Gray.copy(alpha = 0.7f)
+                                                    ),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "Ver Más",
+                                                    color = Color.White,
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -231,6 +251,26 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                                     ) {
                                         items(lista_rated!!) { pelicula ->
                                             PeliculasListItem(pelicula, navigateToDetail)
+                                        }
+                                        item {
+                                            Box(
+                                                modifier = Modifier
+                                                    .width(140.dp)
+                                                    .height(200.dp)
+                                                    .background(Color.Gray.copy(alpha = 0.3f))
+                                                    .border(
+                                                        width = 2.dp,
+                                                        color = Color.Gray.copy(alpha = 0.7f)
+                                                    ),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "Ver Más",
+                                                    color = Color.White,
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
                                         }
                                     }
                                 }
