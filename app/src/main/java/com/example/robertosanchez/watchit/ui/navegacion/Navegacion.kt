@@ -105,7 +105,7 @@ fun Navegacion(auth: AuthManager) {
                 id = id,
                 popularesViewModel = popularesViewModel,
                 ratedViewModel = ratedViewModel,
-                navController = navController
+                navController = navController,
             )
         }
     }

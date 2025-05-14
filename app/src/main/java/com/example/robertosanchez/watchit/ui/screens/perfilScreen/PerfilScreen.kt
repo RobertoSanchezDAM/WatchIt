@@ -65,8 +65,6 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 @Composable
 fun PerfilScreen(auth: AuthManager) {
     val user = auth.getCurrentUser()
-    val navController = rememberNavController()
-    var showDialog by remember { mutableStateOf<DialogType?>(null) }
 
     Scaffold (
         topBar = {

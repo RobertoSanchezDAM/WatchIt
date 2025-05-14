@@ -8,7 +8,7 @@ import com.example.robertosanchez.proyectoapi.repositories.RemoteConnection
 import com.example.robertosanchez.watchit.data.model.Peliculas
 import kotlinx.coroutines.launch
 
-class PeliculasRatedViewModel: ViewModel() {
+class PeliculasRatedViewModel : ViewModel() {
     private val _lista: MutableLiveData<List<Peliculas>> = MutableLiveData()
     val lista: LiveData<List<Peliculas>> = _lista
 
@@ -17,20 +17,30 @@ class PeliculasRatedViewModel: ViewModel() {
 
     init {
         _progressBar.value = true
-        viewModelScope.launch() {
+        viewModelScope.launch {
             try {
-                val movies = RemoteConnection.service.ratedMovies("49336a7ff05331f9880d3bc4f792f260")
-                _lista.value = movies.results.take(10).map {
-                    Peliculas(
-                        it.id,
-                        "https://image.tmdb.org/t/p/w185" + it.poster_path,
-                        it.release_date,
-                        it.title,
-                        it.overview,
-                        "https://image.tmdb.org/t/w185" + it.backdrop_path,
-                        it.genre_ids
+                val allResults = mutableListOf<Peliculas>()
+
+                for (page in 1..10) {
+                    val movies = RemoteConnection.service.ratedMovies(
+                        apiKey = "49336a7ff05331f9880d3bc4f792f260",
+                        page = page
                     )
+                    val mapped = movies.results.map {
+                        Peliculas(
+                            it.id,
+                            "https://image.tmdb.org/t/p/w185${it.poster_path}",
+                            it.release_date,
+                            it.title,
+                            it.overview,
+                            "https://image.tmdb.org/t/p/w185${it.backdrop_path}",
+                            it.genre_ids
+                        )
+                    }
+                    allResults.addAll(mapped)
                 }
+
+                _lista.value = allResults
             } catch (e: Exception) {
                 _lista.value = _lista.value ?: emptyList()
             } finally {
@@ -39,3 +49,4 @@ class PeliculasRatedViewModel: ViewModel() {
         }
     }
 }
+

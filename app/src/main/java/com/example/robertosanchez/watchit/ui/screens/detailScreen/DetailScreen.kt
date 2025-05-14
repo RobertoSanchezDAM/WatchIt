@@ -137,7 +137,7 @@ fun DetailScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     IconButton(
-                        onClick = { navController.navigate( Principal) }
+                        onClick = { navController.navigate( Principal ) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Home,

@@ -169,7 +169,11 @@ private fun ListaLarga(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Perfil",
+                            text = when (seccion) {
+                                "Populares" -> "Películas Populares esta Semana"
+                                "Rated" -> "Películas mejor Valoradas"
+                                else -> "Lista de Películas"
+                            },
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.Black.copy(alpha = 0.8f),
@@ -225,7 +229,9 @@ private fun ListaLarga(
                     }
                 } else {
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(4)
+                        columns = GridCells.Fixed(4),
+                        modifier = Modifier
+                            .padding(top = 75.dp, bottom = 15.dp)
                     ) {
                         items(lista_populares!!) { pelicula ->
                             PeliculaItem(pelicula, navigateToDetail)
@@ -246,7 +252,9 @@ private fun ListaLarga(
                     }
                 } else {
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(4)
+                        columns = GridCells.Fixed(4),
+                        modifier = Modifier
+                            .padding(top = 75.dp, bottom = 15.dp)
                     ) {
                         items(lista_rated!!) { pelicula ->
                             PeliculaItem(pelicula, navigateToDetail)
