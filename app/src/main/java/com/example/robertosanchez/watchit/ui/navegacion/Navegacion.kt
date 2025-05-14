@@ -13,6 +13,7 @@ import com.example.robertosanchez.proyectoapi.ui.screens.inicioScreen.InicioScre
 import com.example.robertosanchez.proyectoapi.ui.screens.loginScreen.LoginScreen
 import com.example.robertosanchez.proyectoapi.ui.screens.registroScreen.RegistroScreen
 import com.example.robertosanchez.watchit.ui.screens.detailScreen.DetailScreen
+import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PerfilScreen
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PrincipalScreen
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasPopularesViewModel
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasRatedViewModel
@@ -68,6 +69,12 @@ fun Navegacion(auth: AuthManager) {
                     navController.navigate(Detail(id))
                 },
                 navigateToLogin = { navController.navigate(Login) }
+            )
+        }
+
+        composable<Perfil> {
+            PerfilScreen(
+                auth = auth
             )
         }
 

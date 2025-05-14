@@ -18,4 +18,7 @@ object Registro
 object Principal
 
 @Serializable
+object Perfil
+
+@Serializable
 data class Detail(val id: Int)

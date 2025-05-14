@@ -37,6 +37,7 @@ import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.model.Peliculas
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
+import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PerfilScreen
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 
@@ -106,177 +107,14 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                 startDestination = BottomNavItem.Home.route
             ) {
                 composable(BottomNavItem.Home.route) {
-                    Scaffold (
-                        topBar = {
-                            TopAppBar(
-                                title = {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = "Inicio",
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            color = Color.Black.copy(alpha = 0.8f),
-                                            modifier = Modifier.padding(top = 8.dp)
-                                        )
-
-                                        if (user?.photoUrl != null) {
-                                            AsyncImage(
-                                                model = ImageRequest.Builder(LocalContext.current)
-                                                    .data(user.photoUrl)
-                                                    .crossfade(true)
-                                                    .build(),
-                                                contentDescription = "Imagen",
-                                                contentScale = ContentScale.Crop,
-                                                modifier = Modifier
-                                                    .padding(top = 8.dp, end = 16.dp)
-                                                    .size(32.dp)
-                                                    .clip(CircleShape)
-                                                    .border(1.dp, Color.Black.copy(alpha = 0.6f), CircleShape)
-                                                    .padding(1.dp)
-                                            )
-                                        } else {
-                                            Image(
-                                                painter = painterResource(R.drawable.profile),
-                                                contentDescription = "Foto de perfil por defecto",
-                                                modifier = Modifier
-                                                    .padding(top = 8.dp, end = 16.dp)
-                                                    .size(32.dp)
-                                                    .clip(CircleShape)
-                                                    .border(2.dp, Color.Black.copy(alpha = 0.6f), CircleShape)
-                                                    .padding(1.dp)
-                                            )
-                                        }
-                                    }
-                                },
-                                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF3B82F6)),
-                                modifier = Modifier
-                                    .height(56.dp)
-                                    .clip(CustomShape())
-                            )
-                        },
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(top = 120.dp, bottom = 26.dp)
-                        ) {
-                            // Peliculas Populares
-                            Text(
-                                text = "Peliculas Populares esta Semana",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color.White,
-                                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
-                            )
-                            if (progressBar_populares) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth().height(200.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            } else {
-                                if (lista_populares!!.isEmpty()) {
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth().height(200.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text("No hay elementos", style = MaterialTheme.typography.bodySmall)
-                                    }
-                                } else {
-                                    LazyRow(
-                                        contentPadding = PaddingValues(horizontal = 16.dp),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        items(lista_populares!!) { pelicula ->
-                                            PeliculasListItem(pelicula, navigateToDetail)
-                                        }
-                                        item {
-                                            Box(
-                                                modifier = Modifier
-                                                    .width(140.dp)
-                                                    .height(200.dp)
-                                                    .background(Color.Gray.copy(alpha = 0.3f))
-                                                    .border(
-                                                        width = 2.dp,
-                                                        color = Color.Gray.copy(alpha = 0.7f)
-                                                    ),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = "Ver Más",
-                                                    color = Color.White,
-                                                    fontSize = 16.sp,
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            // Peliculas mejor Valoradas
-                            Text(
-                                text = "Peliculas mejor Valoradas",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color.White,
-                                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
-                            )
-                            if (progressBar_rated) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth().height(200.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            } else {
-                                if (lista_rated!!.isEmpty()) {
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth().height(200.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text("No hay elementos", style = MaterialTheme.typography.bodySmall)
-                                    }
-                                } else {
-                                    LazyRow(
-                                        contentPadding = PaddingValues(horizontal = 16.dp),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        items(lista_rated!!) { pelicula ->
-                                            PeliculasListItem(pelicula, navigateToDetail)
-                                        }
-                                        item {
-                                            Box(
-                                                modifier = Modifier
-                                                    .width(140.dp)
-                                                    .height(200.dp)
-                                                    .background(Color.Gray.copy(alpha = 0.3f))
-                                                    .border(
-                                                        width = 2.dp,
-                                                        color = Color.Gray.copy(alpha = 0.7f)
-                                                    ),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = "Ver Más",
-                                                    color = Color.White,
-                                                    fontSize = 16.sp,
-                                                    fontWeight = FontWeight.Bold
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    SeccionPeliculas(
+                        lista_populares = lista_populares,
+                        progressBar_populares = progressBar_populares,
+                        lista_rated = lista_rated,
+                        progressBar_rated = progressBar_rated,
+                        user = user,
+                        navigateToDetail = navigateToDetail
+                    )
                 }
                 composable(BottomNavItem.Search.route) {
                     /*SearchContent()*/
@@ -285,7 +123,7 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     /*WatchlistContent()*/
                 }
                 composable(BottomNavItem.Profile.route) {
-                    /*ProfileContent()*/
+                    PerfilScreen(auth)
                 }
             }
         }
@@ -367,4 +205,188 @@ fun Imagen(item: Peliculas, modifier: Modifier = Modifier) {
             .then(modifier),
         contentScale = ContentScale.Crop
     )
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SeccionPeliculas(
+    lista_populares: List<Peliculas>?,
+    progressBar_populares: Boolean,
+    lista_rated: List<Peliculas>?,
+    progressBar_rated: Boolean,
+    user: com.google.firebase.auth.FirebaseUser?,
+    navigateToDetail: (Int) -> Unit
+) {
+    Scaffold (
+        topBar = {
+            TopAppBar(
+                title = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Inicio",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.Black.copy(alpha = 0.8f),
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+
+                        if (user?.photoUrl != null) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(user.photoUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = "Imagen",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .padding(top = 8.dp, end = 16.dp)
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .border(1.dp, Color.Black.copy(alpha = 0.6f), CircleShape)
+                                    .padding(1.dp)
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(R.drawable.profile),
+                                contentDescription = "Foto de perfil por defecto",
+                                modifier = Modifier
+                                    .padding(top = 8.dp, end = 16.dp)
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .border(2.dp, Color.Black.copy(alpha = 0.6f), CircleShape)
+                                    .padding(1.dp)
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF3B82F6)),
+                modifier = Modifier
+                    .height(56.dp)
+                    .clip(CustomShape())
+            )
+        },
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 120.dp, bottom = 26.dp)
+        ) {
+            // Peliculas Populares
+            Text(
+                text = "Peliculas Populares esta Semana",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.White,
+                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+            )
+            if (progressBar_populares) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                if (lista_populares!!.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No hay elementos", style = MaterialTheme.typography.bodySmall)
+                    }
+                } else {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(lista_populares!!) { pelicula ->
+                            PeliculasListItem(pelicula, navigateToDetail)
+                        }
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .width(140.dp)
+                                    .height(200.dp)
+                                    .background(Color.Gray.copy(alpha = 0.3f))
+                                    .border(
+                                        width = 2.dp,
+                                        color = Color.Gray.copy(alpha = 0.7f)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Ver Más",
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Peliculas mejor Valoradas
+            Text(
+                text = "Peliculas mejor Valoradas",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.White,
+                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+            )
+            if (progressBar_rated) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                if (lista_rated!!.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No hay elementos", style = MaterialTheme.typography.bodySmall)
+                    }
+                } else {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(lista_rated!!) { pelicula ->
+                            PeliculasListItem(pelicula, navigateToDetail)
+                        }
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .width(140.dp)
+                                    .height(200.dp)
+                                    .background(Color.Gray.copy(alpha = 0.3f))
+                                    .border(
+                                        width = 2.dp,
+                                        color = Color.Gray.copy(alpha = 0.7f)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Ver Más",
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
