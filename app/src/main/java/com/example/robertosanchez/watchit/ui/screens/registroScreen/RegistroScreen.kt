@@ -1,4 +1,4 @@
-package com.example.robertosanchez.proyectoapi.ui.screens.registroScreen
+package com.example.robertosanchez.watchit.ui.screens.registroScreen
 
 import android.content.Context
 import android.widget.Toast
@@ -45,14 +45,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
-import com.example.robertosanchez.proyectoapi.data.AuthManager
-import com.example.robertosanchez.proyectoapi.data.AuthRes
-import com.example.robertosanchez.proyectoapi.ui.screens.loginScreen.signAnonimous
-import com.example.robertosanchez.proyectoapi.ui.screens.loginScreen.signIn
+import com.example.robertosanchez.watchit.data.AuthManager
+import com.example.robertosanchez.watchit.data.AuthRes
 import com.example.robertosanchez.watchit.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

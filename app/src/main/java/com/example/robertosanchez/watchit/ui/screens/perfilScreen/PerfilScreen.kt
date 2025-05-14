@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.robertosanchez.proyectoapi.data.AuthManager
+import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar

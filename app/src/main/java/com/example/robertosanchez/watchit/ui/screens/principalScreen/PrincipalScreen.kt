@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -32,11 +33,12 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.example.robertosanchez.proyectoapi.data.AuthManager
+import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.model.Peliculas
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
+import com.example.robertosanchez.watchit.ui.screens.listaLargaPeliculas.ListaLargaPeliculas
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PerfilScreen
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
@@ -48,9 +50,8 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     ratedViewModel: PeliculasRatedViewModel,
                     auth: AuthManager,
                     navigateToLogin: () -> Unit,
-                    navigateToDetail: (Int) -> Unit) {
-    val user = auth.getCurrentUser()
-
+                    navigateToDetail: (Int) -> Unit,
+                    navigateToListaLarga: (SeccionType) -> Unit) {
     var showDialog by remember { mutableStateOf<DialogType?>(null) }
     val navController = rememberNavController()
 
@@ -112,8 +113,9 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                         progressBar_populares = progressBar_populares,
                         lista_rated = lista_rated,
                         progressBar_rated = progressBar_rated,
-                        user = user,
-                        navigateToDetail = navigateToDetail
+                        auth = auth,
+                        navigateToDetail = navigateToDetail,
+                        navigateToListaLarga = navigateToListaLarga
                     )
                 }
                 composable(BottomNavItem.Search.route) {
@@ -146,6 +148,11 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
 // Enum para los tipos de diálogos
 enum class DialogType {
     Logout
+}
+
+// Enum para los tipos de secciones
+enum class SeccionType {
+    Populares, Rated
 }
 
 @Composable
@@ -215,9 +222,12 @@ fun SeccionPeliculas(
     progressBar_populares: Boolean,
     lista_rated: List<Peliculas>?,
     progressBar_rated: Boolean,
-    user: com.google.firebase.auth.FirebaseUser?,
-    navigateToDetail: (Int) -> Unit
+    auth: AuthManager,
+    navigateToDetail: (Int) -> Unit,
+    navigateToListaLarga: (SeccionType) -> Unit,
 ) {
+    val user = auth.getCurrentUser()
+
     Scaffold (
         topBar = {
             TopAppBar(
@@ -316,7 +326,8 @@ fun SeccionPeliculas(
                                     .border(
                                         width = 2.dp,
                                         color = Color.Gray.copy(alpha = 0.7f)
-                                    ),
+                                    )
+                                    .clickable { navigateToListaLarga(SeccionType.Populares) },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -373,7 +384,8 @@ fun SeccionPeliculas(
                                     .border(
                                         width = 2.dp,
                                         color = Color.Gray.copy(alpha = 0.7f)
-                                    ),
+                                    )
+                                    .clickable { navigateToListaLarga(SeccionType.Rated) },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(

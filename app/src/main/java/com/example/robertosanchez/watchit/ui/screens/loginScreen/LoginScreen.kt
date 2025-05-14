@@ -1,4 +1,4 @@
-package com.example.robertosanchez.proyectoapi.ui.screens.loginScreen
+package com.example.robertosanchez.watchit.ui.screens.loginScreen
 
 import android.content.Context
 import android.widget.Toast
@@ -54,8 +54,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.example.robertosanchez.proyectoapi.data.AuthManager
-import com.example.robertosanchez.proyectoapi.data.AuthRes
+import com.example.robertosanchez.watchit.data.AuthManager
+import com.example.robertosanchez.watchit.data.AuthRes
 import com.example.robertosanchez.watchit.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.GoogleAuthProvider

@@ -18,6 +18,9 @@ object Registro
 object Principal
 
 @Serializable
+data class ListaLargaPeliculas(val tipo: String = "Populares")
+
+@Serializable
 object Perfil
 
 @Serializable

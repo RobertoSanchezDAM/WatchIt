@@ -1,4 +1,4 @@
-package com.example.robertosanchez.proyectoapi.ui.screens.inicioScreen
+package com.example.robertosanchez.watchit.ui.screens.inicioScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

@@ -1,4 +1,4 @@
-package com.example.robertosanchez.proyectoapi.ui.screens.contrasenaOlvScreen
+package com.example.robertosanchez.watchit.ui.screens.contrasenaOlvScreen
 
 
 import android.content.Context
@@ -38,16 +38,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.robertosanchez.proyectoapi.data.AuthManager
-import com.example.robertosanchez.proyectoapi.data.AuthRes
-import com.example.robertosanchez.proyectoapi.ui.screens.loginScreen.signAnonimous
-import com.example.robertosanchez.proyectoapi.ui.screens.loginScreen.signIn
+import com.example.robertosanchez.watchit.data.AuthManager
+import com.example.robertosanchez.watchit.data.AuthRes
 import com.example.robertosanchez.watchit.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

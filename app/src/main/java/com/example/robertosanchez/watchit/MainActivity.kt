@@ -3,7 +3,7 @@ package com.example.robertosanchez.watchit
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.robertosanchez.proyectoapi.data.AuthManager
+import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.ui.navegacion.Navegacion
 import com.example.robertosanchez.watchit.ui.theme.WatchItTheme
 import com.google.firebase.analytics.ktx.analytics
