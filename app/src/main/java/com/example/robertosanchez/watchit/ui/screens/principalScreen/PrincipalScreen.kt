@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
@@ -25,7 +24,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -35,10 +33,10 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.R
-import com.example.robertosanchez.watchit.data.model.Peliculas
+import com.example.robertosanchez.watchit.data.model.MediaItem
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
-import com.example.robertosanchez.watchit.ui.screens.listaLargaPeliculas.ListaLargaPeliculas
+import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PerfilScreen
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
@@ -48,6 +46,7 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 @Composable
 fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     ratedViewModel: PeliculasRatedViewModel,
+                    favoritasViewModel: PeliculasFavoritasViewModel,
                     auth: AuthManager,
                     navigateToLogin: () -> Unit,
                     navigateToDetail: (Int) -> Unit,
@@ -125,7 +124,7 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     /*WatchlistContent()*/
                 }
                 composable(BottomNavItem.Profile.route) {
-                    PerfilScreen(auth)
+                    PerfilScreen(auth, favoritasViewModel)
                 }
             }
         }
@@ -182,7 +181,7 @@ fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
 }
 
 @Composable
-private fun PeliculasListItem(pelicula: Peliculas, navigateToDetail: (Int) -> Unit) {
+private fun PeliculasListItem(pelicula: MediaItem, navigateToDetail: (Int) -> Unit) {
     Box(
         modifier = Modifier
             .width(140.dp)
@@ -198,7 +197,7 @@ private fun PeliculasListItem(pelicula: Peliculas, navigateToDetail: (Int) -> Un
 }
 
 @Composable
-fun Imagen(item: Peliculas, modifier: Modifier = Modifier) {
+fun Imagen(item: MediaItem, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     Image(
@@ -218,9 +217,9 @@ fun Imagen(item: Peliculas, modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeccionPeliculas(
-    lista_populares: List<Peliculas>?,
+    lista_populares: List<MediaItem>?,
     progressBar_populares: Boolean,
-    lista_rated: List<Peliculas>?,
+    lista_rated: List<MediaItem>?,
     progressBar_rated: Boolean,
     auth: AuthManager,
     navigateToDetail: (Int) -> Unit,

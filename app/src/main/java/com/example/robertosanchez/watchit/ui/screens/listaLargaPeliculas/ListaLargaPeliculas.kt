@@ -7,9 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,7 +24,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -46,15 +43,14 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.AuthManager
-import com.example.robertosanchez.watchit.data.model.Peliculas
+import com.example.robertosanchez.watchit.data.model.MediaItem
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
+import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PerfilScreen
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasPopularesViewModel
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasRatedViewModel
-import com.example.robertosanchez.watchit.ui.screens.principalScreen.SeccionPeliculas
-import com.example.robertosanchez.watchit.ui.screens.principalScreen.SeccionType
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 
@@ -64,6 +60,7 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 fun ListaLargaPeliculas(
     popularesViewModel: PeliculasPopularesViewModel,
     ratedViewModel: PeliculasRatedViewModel,
+    favoritasViewModel: PeliculasFavoritasViewModel,
     seccion: String,
     navigateToDetail: (Int) -> Unit,
     auth: AuthManager,
@@ -77,6 +74,7 @@ fun ListaLargaPeliculas(
 
     val lista_rated by ratedViewModel.lista.observeAsState(emptyList())
     val progressBar_rated by ratedViewModel.progressBar.observeAsState(false)
+
 
     Scaffold(
         bottomBar = {
@@ -138,7 +136,7 @@ fun ListaLargaPeliculas(
                     /*WatchlistContent()*/
                 }
                 composable(BottomNavItem.Profile.route) {
-                    PerfilScreen(auth)
+                    PerfilScreen(auth, favoritasViewModel)
                 }
             }
         }
@@ -149,9 +147,9 @@ fun ListaLargaPeliculas(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ListaLarga(
-    lista_populares: List<Peliculas>?,
+    lista_populares: List<MediaItem>?,
     progressBar_populares: Boolean,
-    lista_rated: List<Peliculas>?,
+    lista_rated: List<MediaItem>?,
     progressBar_rated: Boolean,
     seccion: String,
     navigateToDetail: (Int) -> Unit,
@@ -267,7 +265,7 @@ private fun ListaLarga(
 }
 
 @Composable
-private fun PeliculaItem(pelicula: Peliculas, navigateToDetail: (Int) -> Unit) {
+private fun PeliculaItem(pelicula: MediaItem, navigateToDetail: (Int) -> Unit) {
     Box(
         modifier = Modifier
             .width(140.dp)
@@ -283,7 +281,7 @@ private fun PeliculaItem(pelicula: Peliculas, navigateToDetail: (Int) -> Unit) {
 }
 
 @Composable
-fun Imagen(item: Peliculas, modifier: Modifier = Modifier) {
+fun Imagen(item: MediaItem, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     Image(

@@ -5,11 +5,13 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,9 +35,14 @@ import androidx.navigation.NavController
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
 import androidx.navigation.compose.rememberNavController
+import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
 import com.example.robertosanchez.watchit.ui.navegacion.Principal
+import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.text.style.TextAlign
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,6 +51,7 @@ fun DetailScreen(
     id: Int,
     popularesViewModel: PeliculasPopularesViewModel,
     ratedViewModel: PeliculasRatedViewModel,
+    anadirViewModel: PeliculasFavoritasViewModel,
     navController: NavController
 ) {
     var showDialog by remember { mutableStateOf<DialogType?>(null) }
@@ -83,7 +91,7 @@ fun DetailScreen(
         creditsViewModel.fetchCredits(id)
         imagesViewModel.fetchImages(id)
     }
-    
+
     val pelicula = remember(id) {
         listaPopulares.find { it.id == id } ?: listaRated.find { it.id == id }
     }
@@ -91,16 +99,22 @@ fun DetailScreen(
     val generosId = pelicula?.genre_ids ?: emptyList()
     val generosNombre = generosId.mapNotNull { generos[it] }
 
+    val uiState by anadirViewModel.uiState.collectAsState()
+    val peliculasAnadidas = uiState.peliculas
+
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(
-                    text = "Detalles de la Película",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.Black.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(top = 8.dp)
-                ) },
+                title = {
+                    Text(
+                        text = "Detalles de la Película",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.Black.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF3B82F6),
                     titleContentColor = Color.White
@@ -137,7 +151,7 @@ fun DetailScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     IconButton(
-                        onClick = { navController.navigate( Principal ) }
+                        onClick = { navController.navigate(Principal) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Home,
@@ -149,188 +163,220 @@ fun DetailScreen(
                 }
             }
         }
-    ) {
-        Column(
+    ) { paddingValues ->
+
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .padding(paddingValues),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            pelicula?.let { pelicula ->
-                Box(modifier = Modifier.fillMaxSize()) {
-                    // Fondo: backdrop o póster si no hay
-                    val backdropPath = images?.backdrops?.maxByOrNull { it.width ?: 0 }?.file_path
-                        ?: images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path
-                        ?: pelicula.poster
-                    Image(
-                        painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original" + backdropPath),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(350.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(340.dp)
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(
-                                        Color.Black.copy(alpha = 0.7f),
-                                        Color.Transparent,
-                                        Color(0xFF1E1E1E)
-                                    ),
-                                    startY = 0f,
-                                    endY = 625f
+            item {
+                pelicula?.let { pelicula ->
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        val backdropPath = images?.backdrops?.maxByOrNull { it.width ?: 0 }?.file_path
+                            ?: images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path
+                            ?: pelicula.poster
+                        Image(
+                            painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original$backdropPath"),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(350.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(340.dp)
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color.Black.copy(alpha = 0.7f),
+                                            Color.Transparent,
+                                            Color(0xFF1E1E1E)
+                                        ),
+                                        startY = 0f,
+                                        endY = 625f
+                                    )
                                 )
-                            )
-                    )
-                    // Contenido principal
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 220.dp)
-                            .background(Color(0xFF1E1E1E))
-                            .padding(16.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            // Póster
-                            val posterPath = images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path ?: pelicula.poster
-                            Image(
-                                painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original" + posterPath),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .width(110.dp)
-                                    .height(150.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                            )
-                            Spacer(modifier = Modifier.width(16.dp))
-                            // Info principal
-                            Column {
-                                Text(pelicula.title, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                                credits?.let { cr ->
-                                    val director = cr.crew.find { it.job == "Director" }
-                                    director?.let {
-                                        Text("Dirigido por ${it.name}", color = Color.LightGray, fontSize = 16.sp)
+                        )
+                        // Contenido principal
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 220.dp)
+                                .background(Color(0xFF1E1E1E))
+                                .padding(16.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                val posterPath = images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path ?: pelicula.poster
+                                Image(
+                                    painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original$posterPath"),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .width(110.dp)
+                                        .height(150.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Column {
+                                    Text(
+                                        pelicula.title,
+                                        color = Color.White,
+                                        fontSize = 28.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    credits?.let { cr ->
+                                        val director = cr.crew.find { it.job == "Director" }
+                                        director?.let {
+                                            Text(
+                                                "Dirigido por ${it.name}",
+                                                color = Color.LightGray,
+                                                fontSize = 16.sp
+                                            )
+                                        }
+                                    }
+                                    Text(pelicula.release_date, color = Color.LightGray, fontSize = 14.sp)
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    if (generosNombre.isNotEmpty()) {
+                                        Text(
+                                            text = generosNombre.joinToString(", "),
+                                            color = Color.LightGray,
+                                            fontSize = 12.sp,
+                                        )
                                     }
                                 }
-                                Text(pelicula.release_date, color = Color.LightGray, fontSize = 14.sp)
-                                Spacer(modifier = Modifier.height(8.dp))
-                                if (generosNombre.isNotEmpty()) {
-                                    Text(
-                                        text = generosNombre.joinToString(", "),
-                                        color = Color.LightGray,
-                                        fontSize = 12.sp,
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            IconButton(
+                                onClick = {
+                                    anadirViewModel.addPelicula(
+                                        Pelicula(
+                                            id = "",
+                                            peliculaId = pelicula.id,
+                                            poster = pelicula.poster
+                                        )
                                     )
                                 }
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        // Sinopsis con botón "Leer mas"
-                        var expandir by remember { mutableStateOf(false) }
-                        Text(
-                            text = "Sinopsis",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-                        val sinopsis = pelicula.sinopsis ?: "Sinopsis no disponible."
-                        val maxLineas = if (expandir) Int.MAX_VALUE else 3
-                        Text(
-                            text = sinopsis,
-                            color = Color.White,
-                            maxLines = maxLineas,
-                            fontSize = 16.sp
-                        )
-                        if (!expandir && sinopsis.length > 120) {
-                            TextButton(
-                                onClick = { expandir = true },
-                                modifier = Modifier.padding(0.dp),
-                                contentPadding = PaddingValues(0.dp)
                             ) {
-                                Text("Leer más", color = Color.Gray)
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = "Añadir a favoritas",
+                                    tint = Color.Red
+                                )
                             }
-                        }
-                        if (expandir && sinopsis.length > 120) {
-                            TextButton(
-                                onClick = { expandir = false },
-                                modifier = Modifier.padding(0.dp),
-                                contentPadding = PaddingValues(0.dp)
-                            ) {
-                                Text("Leer menos", color = Color.Gray)
-                            }
-                        }
-                        // Cast principal
-                        credits?.cast?.take(10)?.let { castList ->
+
                             Spacer(modifier = Modifier.height(16.dp))
+
+                            var expandir by remember { mutableStateOf(false) }
                             Text(
-                                text = "Reparto principal",
+                                text = "Sinopsis",
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                modifier = Modifier.padding(bottom = 4.dp)
                             )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                castList.forEach { actor ->
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier.width(60.dp)
-                                    ) {
-                                        val profileUrl = actor.profile_path?.let { "https://image.tmdb.org/t/p/w185$it" }
-                                        if (profileUrl != null) {
-                                            Image(
-                                                painter = rememberAsyncImagePainter(profileUrl),
-                                                contentDescription = actor.name,
-                                                modifier = Modifier
-                                                    .size(48.dp)
-                                                    .clip(CircleShape),
-                                                contentScale = ContentScale.Crop
-                                            )
-                                        } else {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(48.dp)
-                                                    .clip(CircleShape)
-                                                    .background(Color.Gray),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = actor.name,
-                                                    color = Color.White,
-                                                    fontWeight = FontWeight.Bold
+                            val sinopsis = pelicula.sinopsis ?: "Sinopsis no disponible."
+                            val maxLineas = if (expandir) Int.MAX_VALUE else 3
+                            Text(
+                                text = sinopsis,
+                                color = Color.White,
+                                maxLines = maxLineas,
+                                fontSize = 16.sp
+                            )
+                            if (!expandir && sinopsis.length > 120) {
+                                TextButton(
+                                    onClick = { expandir = true },
+                                    modifier = Modifier.padding(0.dp),
+                                    contentPadding = PaddingValues(0.dp)
+                                ) {
+                                    Text("Leer más", color = Color.Gray)
+                                }
+                            }
+                            if (expandir && sinopsis.length > 120) {
+                                TextButton(
+                                    onClick = { expandir = false },
+                                    modifier = Modifier.padding(0.dp),
+                                    contentPadding = PaddingValues(0.dp)
+                                ) {
+                                    Text("Leer menos", color = Color.Gray)
+                                }
+                            }
+
+                            credits?.cast?.take(10)?.let { castList ->
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "Reparto principal",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    castList.forEach { actor ->
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            modifier = Modifier.width(60.dp)
+                                        ) {
+                                            val profileUrl = actor.profile_path?.let { "https://image.tmdb.org/t/p/w185$it" }
+                                            if (profileUrl != null) {
+                                                Image(
+                                                    painter = rememberAsyncImagePainter(profileUrl),
+                                                    contentDescription = actor.name,
+                                                    modifier = Modifier
+                                                        .size(48.dp)
+                                                        .clip(CircleShape),
+                                                    contentScale = ContentScale.Crop
                                                 )
+                                            } else {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(48.dp)
+                                                        .clip(CircleShape)
+                                                        .background(Color.Gray),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(
+                                                        text = actor.name,
+                                                        color = Color.White,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
                                             }
+                                            Text(
+                                                text = actor.name,
+                                                color = Color.White,
+                                                fontSize = 12.sp,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                maxLines = 2,
+                                                textAlign = TextAlign.Center,
+                                                lineHeight = 1.5.em
+                                            )
+                                            Spacer(modifier = Modifier.height(100.dp))
                                         }
-                                        Text(
-                                            text = actor.name,
-                                            color = Color.White,
-                                            fontSize = 12.sp,
-                                            modifier = Modifier.fillMaxWidth(),
-                                            maxLines = 2,
-                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                            lineHeight = 1.5.em
-                                        )
-                                        Spacer(modifier = Modifier.height(100.dp))
                                     }
                                 }
                             }
                         }
                     }
-                }
-            } ?: run {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Película no encontrada",
-                        color = Color.White,
-                        fontSize = 20.sp
-                    )
+                } ?: run {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Película no encontrada",
+                            color = Color.White,
+                            fontSize = 20.sp
+                        )
+                    }
                 }
             }
         }
@@ -367,3 +413,4 @@ fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
         }
     )
 }
+

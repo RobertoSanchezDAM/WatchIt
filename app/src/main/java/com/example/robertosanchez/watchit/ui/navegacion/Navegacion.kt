@@ -3,11 +3,13 @@ package com.example.robertosanchez.watchit.ui.navegacion
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.robertosanchez.watchit.data.AuthManager
+import com.example.robertosanchez.watchit.db.FirestoreManager
 import com.example.robertosanchez.watchit.ui.screens.contrasenaOlvScreen.ContrasenaOlvScreen
 import com.example.robertosanchez.watchit.ui.screens.inicioScreen.InicioScreen
 import com.example.robertosanchez.watchit.ui.screens.detailScreen.DetailScreen
@@ -18,6 +20,8 @@ import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasPo
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasRatedViewModel
 import com.example.robertosanchez.watchit.ui.screens.registroScreen.RegistroScreen
 import com.example.robertosanchez.watchit.ui.screens.listaLargaPeliculas.ListaLargaPeliculas
+import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
+import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModelFactory
 
 
 @Composable
@@ -26,6 +30,11 @@ fun Navegacion(auth: AuthManager) {
     val context = LocalContext.current
     val popularesViewModel = remember { PeliculasPopularesViewModel() }
     val ratedViewModel = remember { PeliculasRatedViewModel() }
+
+    val firestoreManager = FirestoreManager(auth, context)
+    val peliculasFavoritasViewModel: PeliculasFavoritasViewModel = viewModel(
+        factory = PeliculasFavoritasViewModelFactory(firestoreManager)
+    )
 
     NavHost(navController = navController, startDestination = Inicio) {
         composable<Inicio> {
@@ -65,6 +74,7 @@ fun Navegacion(auth: AuthManager) {
             PrincipalScreen(
                 popularesViewModel = popularesViewModel,
                 ratedViewModel = ratedViewModel,
+                favoritasViewModel = peliculasFavoritasViewModel,
                 auth = auth,
                 navigateToDetail = { id ->
                     navController.navigate(Detail(id))
@@ -81,6 +91,7 @@ fun Navegacion(auth: AuthManager) {
             ListaLargaPeliculas(
                 popularesViewModel = popularesViewModel,
                 ratedViewModel = ratedViewModel,
+                favoritasViewModel = peliculasFavoritasViewModel,
                 seccion = seccion.tipo,
                 navigateToDetail = { id ->
                     navController.navigate(Detail(id))
@@ -94,7 +105,8 @@ fun Navegacion(auth: AuthManager) {
 
         composable<Perfil> {
             PerfilScreen(
-                auth = auth
+                auth = auth,
+                anadirViewModel = peliculasFavoritasViewModel
             )
         }
 
@@ -106,6 +118,7 @@ fun Navegacion(auth: AuthManager) {
                 popularesViewModel = popularesViewModel,
                 ratedViewModel = ratedViewModel,
                 navController = navController,
+                anadirViewModel = peliculasFavoritasViewModel
             )
         }
     }

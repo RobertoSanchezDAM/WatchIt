@@ -1,6 +1,6 @@
 package com.example.robertosanchez.watchit.data.model
 
-data class Peliculas(
+data class MediaItem(
     val id: Int,
     val poster: String,
     val release_date: String,

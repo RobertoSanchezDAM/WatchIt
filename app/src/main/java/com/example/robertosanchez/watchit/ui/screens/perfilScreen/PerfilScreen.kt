@@ -1,6 +1,7 @@
 package com.example.robertosanchez.watchit.ui.screens.perfilScreen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -35,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.R
@@ -63,8 +67,11 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilScreen(auth: AuthManager) {
+fun PerfilScreen(auth: AuthManager, anadirViewModel: PeliculasFavoritasViewModel) {
     val user = auth.getCurrentUser()
+
+    val uiState by anadirViewModel.uiState.collectAsState()
+    val peliculasAnadidas = uiState.peliculas
 
     Scaffold (
         topBar = {
@@ -174,6 +181,28 @@ fun PerfilScreen(auth: AuthManager) {
                 fontSize = 16.sp,
                 color = Color.White.copy(alpha = 0.8f)
             )
+
+            peliculasAnadidas.forEach { pelicula ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    pelicula.poster?.let { posterUrl ->
+                        Image(
+                            painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/w185$posterUrl"),
+                            contentDescription = "poster",
+                            modifier = Modifier.size(100.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "ID: ${pelicula.peliculaId}",
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
+            }
+
         }
     }
 }

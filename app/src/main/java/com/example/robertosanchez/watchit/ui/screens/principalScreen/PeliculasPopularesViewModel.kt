@@ -5,12 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.robertosanchez.proyectoapi.repositories.RemoteConnection
-import com.example.robertosanchez.watchit.data.model.Peliculas
+import com.example.robertosanchez.watchit.data.model.MediaItem
 import kotlinx.coroutines.launch
 
 class PeliculasPopularesViewModel : ViewModel() {
-    private val _lista: MutableLiveData<List<Peliculas>> = MutableLiveData()
-    val lista: LiveData<List<Peliculas>> = _lista
+    private val _lista: MutableLiveData<List<MediaItem>> = MutableLiveData()
+    val lista: LiveData<List<MediaItem>> = _lista
 
     private val _progressBar: MutableLiveData<Boolean> = MutableLiveData(false)
     val progressBar: LiveData<Boolean> = _progressBar
@@ -22,7 +22,7 @@ class PeliculasPopularesViewModel : ViewModel() {
     private fun fetchPopularMovies() {
         _progressBar.value = true
         viewModelScope.launch {
-            val allMovies = mutableListOf<Peliculas>()
+            val allMovies = mutableListOf<MediaItem>()
             try {
                 for (page in 1..3) { // Cambia el rango según cuántas páginas quieras
                     val response = RemoteConnection.service.popularMovies(
@@ -30,7 +30,7 @@ class PeliculasPopularesViewModel : ViewModel() {
                         page = page
                     )
                     val mappedMovies = response.results.map {
-                        Peliculas(
+                        MediaItem(
                             it.id,
                             "https://image.tmdb.org/t/p/w185${it.poster_path}",
                             it.release_date,
