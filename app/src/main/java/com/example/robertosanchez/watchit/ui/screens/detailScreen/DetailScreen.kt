@@ -99,10 +99,6 @@ fun DetailScreen(
     val generosId = pelicula?.genre_ids ?: emptyList()
     val generosNombre = generosId.mapNotNull { generos[it] }
 
-    val uiState by anadirViewModel.uiState.collectAsState()
-    val peliculasAnadidas = uiState.peliculas
-
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -163,14 +159,10 @@ fun DetailScreen(
                 }
             }
         }
-    ) { paddingValues ->
-
+    ) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .fillMaxSize(),
         ) {
             item {
                 pelicula?.let { pelicula ->
@@ -382,35 +374,3 @@ fun DetailScreen(
         }
     }
 }
-
-// Enum para los tipos de diálogos
-enum class DialogType {
-    Logout
-}
-
-@Composable
-fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Color(0xFF2196F3),
-        title = { Text("Cerrar Sesión", color = Color.Black) },
-        text = { Text("¿Estás seguro de que deseas cerrar sesión?", color = Color.Black) },
-        confirmButton = {
-            Button(
-                onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E1E1E))
-            ) {
-                Text("Aceptar", color = Color.White)
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E1E1E))
-            ) {
-                Text("Cancelar", color = Color.White)
-            }
-        }
-    )
-}
-

@@ -1,6 +1,5 @@
 package com.example.robertosanchez.proyectoapi.repositories
 
-
 import com.example.robertosanchez.watchit.repositories.models.CreditsResponse
 import com.example.robertosanchez.watchit.repositories.models.MovieImagesResponse
 import com.example.robertosanchez.watchit.repositories.models.RemoteResult
@@ -9,13 +8,13 @@ import retrofit2.http.Query
 
 interface RemoteService {
     @GET("discover/movie?language=es-ES&sort_by=popularity.desc")
-    suspend fun popularMovies(
+    suspend fun cancionesPopulares(
         @Query("api_key") apiKey: String,
         @Query("page") page: Int = 1
     ): RemoteResult
 
     @GET("discover/movie?language=es-ES&sort_by=vote_count.desc")
-    suspend fun ratedMovies(
+    suspend fun peliculasRated(
         @Query("api_key") apiKey: String,
         @Query("page") page: Int = 1
     ): RemoteResult
@@ -31,4 +30,13 @@ interface RemoteService {
         @retrofit2.http.Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String
     ): MovieImagesResponse
+
+    @GET("search/movie")
+    suspend fun buscarPeliculas(
+        @Query("query") query: String,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = "es-ES",
+        @Query("page") page: Int = 1,
+        @Query("include_adult") includeAdult: Boolean = true
+    ): RemoteResult
 }

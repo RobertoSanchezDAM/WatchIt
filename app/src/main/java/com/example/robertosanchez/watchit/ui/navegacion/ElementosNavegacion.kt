@@ -25,3 +25,9 @@ object Perfil
 
 @Serializable
 data class Detail(val id: Int)
+
+@Serializable
+object Busqueda
+
+@Serializable
+data class BusquedaNombreScreen(val pelicula: String)

@@ -1,38 +1,35 @@
-package com.example.robertosanchez.watchit.ui.screens.listaLargaPeliculas
+package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaNombreScreen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,38 +42,34 @@ import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.data.model.MediaItem
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
-import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
+import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaViewModel
+import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PerfilScreen
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasPopularesViewModel
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasRatedViewModel
+import com.example.robertosanchez.watchit.ui.screens.principalScreen.SeccionPeliculas
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.SeccionType
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaLargaPeliculasScreen(
-    popularesViewModel: PeliculasPopularesViewModel,
-    ratedViewModel: PeliculasRatedViewModel,
-    favoritasViewModel: PeliculasFavoritasViewModel,
-    seccion: String,
-    navigateToDetail: (Int) -> Unit,
+fun BusquedaNombreScreen(
+    viewModel: BusquedaViewModel,
     auth: AuthManager,
-    navigateToPrincipal: () -> Unit,
     navigateToLogin: () -> Unit,
+    navigateToDetail: (Int) -> Unit,
+    navigateToPrincipal: () -> Unit,
 ) {
     val user = auth.getCurrentUser()
-    var showDialog by remember { mutableStateOf<DialogType?>(null) }
     val navController = rememberNavController()
+    var showDialog by remember { mutableStateOf<DialogType?>(null) }
 
-    val lista_populares by popularesViewModel.lista.observeAsState(emptyList())
-    val progressBar_populares by popularesViewModel.progressBar.observeAsState(false)
-
-    val lista_rated by ratedViewModel.lista.observeAsState(emptyList())
-    val progressBar_rated by ratedViewModel.progressBar.observeAsState(false)
-
+    val lista_buscada by viewModel.lista.observeAsState(emptyList())
+    val progressBar_buscada by viewModel.progressBar.observeAsState(false)
 
     Scaffold(
         topBar = {
@@ -88,11 +81,7 @@ fun ListaLargaPeliculasScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = when (seccion) {
-                                "Populares" -> "Películas Populares esta Semana"
-                                "Rated" -> "Películas mejor Valoradas"
-                                else -> "Lista de Películas"
-                            },
+                            text = "Resultado de búsqueda",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.Black.copy(alpha = 0.8f),
@@ -150,103 +139,89 @@ fun ListaLargaPeliculasScreen(
                         onLogoutClick = { showDialog = DialogType.Logout }
                     )
                 }
+                // Botón flotante de inicio
                 Box(
                     modifier = Modifier
                         .offset(y = (-25).dp)
                         .size(56.dp)
                         .clip(CircleShape)
                         .background(Color(0xFF2196F3))
-                        .padding(16.dp)
-                        .clickable { navigateToPrincipal() },
+                        .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Home,
-                        contentDescription = "Inicio",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
+                    IconButton(
+                        onClick = { navigateToPrincipal() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = "Inicio",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            NavHost(
-                navController = navController,
-                startDestination = BottomNavItem.Home.route
-            ) {
-                composable(BottomNavItem.Home.route) {
-                    when (seccion) {
-                        "Populares" -> {
-                            if (progressBar_populares) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            } else {
-                                LazyVerticalGrid(
-                                    columns = GridCells.Fixed(4),
-                                    modifier = Modifier
-                                        .padding(bottom = 15.dp)
-                                ) {
-                                    items(lista_populares!!) { pelicula ->
-                                        PeliculaItem(pelicula, navigateToDetail)
-                                    }
-                                }
-                            }
-                        }
-
-                        "Rated" -> {
-                            if (progressBar_rated) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            } else {
-                                LazyVerticalGrid(
-                                    columns = GridCells.Fixed(4),
-                                    modifier = Modifier
-                                        .padding( bottom = 15.dp)
-                                ) {
-                                    items(lista_rated!!) { pelicula ->
-                                        PeliculaItem(pelicula, navigateToDetail)
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    when (showDialog) {
-                        DialogType.Logout -> {
-                            LogoutDialog(
-                                onDismiss = { showDialog = null },
-                                onConfirm = {
-                                    auth.signOut()
-                                    navigateToLogin()
-                                }
-                            )
-                        }
-                        else -> Unit
+            if (progressBar_buscada) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = Color(0xFF3B82F6),
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+            } else if (lista_buscada.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Sin resultados",
+                            tint = Color.White.copy(alpha = 0.6f),
+                            modifier = Modifier.size(64.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "No se encontraron películas",
+                            color = Color.White.copy(alpha = 0.6f),
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
-                composable(BottomNavItem.Search.route) {
-                    /*SearchContent()*/
-                }
-                composable(BottomNavItem.Watch.route) {
-                    /*WatchlistContent()*/
-                }
-                composable(BottomNavItem.Profile.route) {
-                    PerfilScreen(auth, favoritasViewModel)
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(4),
+                    modifier = Modifier
+                        .padding(bottom = 15.dp)
+                ) {
+                    items(lista_buscada!!) { pelicula ->
+                        PeliculaItem(pelicula, navigateToDetail)
+                    }
                 }
             }
+        }
+
+        when (showDialog) {
+            DialogType.Logout -> {
+                LogoutDialog(
+                    onDismiss = { showDialog = null },
+                    onConfirm = {
+                        auth.signOut()
+                        navigateToLogin()
+                    }
+                )
+            }
+            else -> Unit
         }
     }
 }
@@ -309,4 +284,3 @@ fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
         }
     )
 }
-

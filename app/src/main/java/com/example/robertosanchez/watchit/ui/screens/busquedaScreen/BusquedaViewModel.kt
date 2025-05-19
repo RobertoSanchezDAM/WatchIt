@@ -1,14 +1,16 @@
-package com.example.robertosanchez.watchit.ui.screens.principalScreen
+package com.example.robertosanchez.watchit.ui.screens.busquedaScreen
 
+import android.util.Log
+import com.example.robertosanchez.watchit.data.model.MediaItem
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.robertosanchez.proyectoapi.repositories.RemoteConnection
-import com.example.robertosanchez.watchit.data.model.MediaItem
 import kotlinx.coroutines.launch
 
-class PeliculasRatedViewModel : ViewModel() {
+class BusquedaViewModel(private var pelicula: String) : ViewModel() {
+
     private val _lista: MutableLiveData<List<MediaItem>> = MutableLiveData()
     val lista: LiveData<List<MediaItem>> = _lista
 
@@ -16,17 +18,25 @@ class PeliculasRatedViewModel : ViewModel() {
     val progressBar: LiveData<Boolean> = _progressBar
 
     init {
+        if (pelicula.isNotBlank()) {
+            buscarPeliculas(pelicula)
+        }
+    }
+
+    fun buscarPeliculas(pelicula: String) {
+        if (pelicula.isBlank()) return
+        
         _progressBar.value = true
         viewModelScope.launch {
+            val allMovies = mutableListOf<MediaItem>()
             try {
-                val allResults = mutableListOf<MediaItem>()
-
-                for (page in 1..10) {
-                    val movies = RemoteConnection.service.peliculasRated(
+                for (page in 1..5) {
+                    val response = RemoteConnection.service.buscarPeliculas(
+                        query = pelicula,
                         apiKey = "49336a7ff05331f9880d3bc4f792f260",
                         page = page
                     )
-                    val mapped = movies.results.map {
+                    val mappedMovies = response.results.map {
                         MediaItem(
                             it.id,
                             "https://image.tmdb.org/t/p/w185${it.poster_path}",
@@ -37,10 +47,10 @@ class PeliculasRatedViewModel : ViewModel() {
                             it.genre_ids
                         )
                     }
-                    allResults.addAll(mapped)
+                    allMovies.addAll(mappedMovies)
                 }
 
-                _lista.value = allResults
+                _lista.value = allMovies
             } catch (e: Exception) {
                 _lista.value = _lista.value ?: emptyList()
             } finally {
@@ -49,4 +59,3 @@ class PeliculasRatedViewModel : ViewModel() {
         }
     }
 }
-

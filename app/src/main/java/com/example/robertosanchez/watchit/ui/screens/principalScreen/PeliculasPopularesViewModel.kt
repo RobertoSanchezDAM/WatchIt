@@ -24,8 +24,8 @@ class PeliculasPopularesViewModel : ViewModel() {
         viewModelScope.launch {
             val allMovies = mutableListOf<MediaItem>()
             try {
-                for (page in 1..3) { // Cambia el rango según cuántas páginas quieras
-                    val response = RemoteConnection.service.popularMovies(
+                for (page in 1..3) {
+                    val response = RemoteConnection.service.cancionesPopulares(
                         apiKey = "49336a7ff05331f9880d3bc4f792f260",
                         page = page
                     )

@@ -36,6 +36,7 @@ import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.model.MediaItem
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaScreen
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PerfilScreen
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
@@ -50,7 +51,8 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     auth: AuthManager,
                     navigateToLogin: () -> Unit,
                     navigateToDetail: (Int) -> Unit,
-                    navigateToListaLarga: (SeccionType) -> Unit) {
+                    navigateToListaLarga: (SeccionType) -> Unit,
+                    navigateToBusquedaNombre: (String) -> Unit) {
     var showDialog by remember { mutableStateOf<DialogType?>(null) }
     val navController = rememberNavController()
 
@@ -118,7 +120,10 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     )
                 }
                 composable(BottomNavItem.Search.route) {
-                    /*SearchContent()*/
+                    BusquedaScreen(
+                        auth = auth,
+                        navigateToBusquedaNombre = navigateToBusquedaNombre
+                    )
                 }
                 composable(BottomNavItem.Watch.route) {
                     /*WatchlistContent()*/
@@ -142,42 +147,6 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
             else -> Unit
         }
     }
-}
-
-// Enum para los tipos de diálogos
-enum class DialogType {
-    Logout
-}
-
-// Enum para los tipos de secciones
-enum class SeccionType {
-    Populares, Rated
-}
-
-@Composable
-fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Color(0xFF2196F3),
-        title = { Text("Cerrar Sesión", color = Color.Black) },
-        text = { Text("¿Estás seguro de que deseas cerrar sesión?", color = Color.Black) },
-        confirmButton = {
-            Button(
-                onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E1E1E))
-            ) {
-                Text("Aceptar", color = Color.White)
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E1E1E))
-            ) {
-                Text("Cancelar", color = Color.White)
-            }
-        }
-    )
 }
 
 @Composable
@@ -400,4 +369,40 @@ fun SeccionPeliculas(
             }
         }
     }
+}
+
+// Enum para los tipos de diálogos
+enum class DialogType {
+    Logout
+}
+
+// Enum para los tipos de secciones
+enum class SeccionType {
+    Populares, Rated
+}
+
+@Composable
+fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF2196F3),
+        title = { Text("Cerrar Sesión", color = Color.Black) },
+        text = { Text("¿Estás seguro de que deseas cerrar sesión?", color = Color.Black) },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E1E1E))
+            ) {
+                Text("Aceptar", color = Color.White)
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E1E1E))
+            ) {
+                Text("Cancelar", color = Color.White)
+            }
+        }
+    )
 }
