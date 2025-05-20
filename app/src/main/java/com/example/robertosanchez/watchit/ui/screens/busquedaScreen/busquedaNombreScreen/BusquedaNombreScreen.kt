@@ -21,36 +21,26 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.data.model.MediaItem
-import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaViewModel
-import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
-import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PerfilScreen
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
-import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasPopularesViewModel
-import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasRatedViewModel
-import com.example.robertosanchez.watchit.ui.screens.principalScreen.SeccionPeliculas
-import com.example.robertosanchez.watchit.ui.screens.principalScreen.SeccionType
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 
@@ -70,6 +60,8 @@ fun BusquedaNombreScreen(
 
     val lista_buscada by viewModel.lista.observeAsState(emptyList())
     val progressBar_buscada by viewModel.progressBar.observeAsState(false)
+
+    Log.d("PELICULAS LISTA", "PELICULAS LISTA: $lista_buscada")
 
     Scaffold(
         topBar = {
@@ -139,7 +131,6 @@ fun BusquedaNombreScreen(
                         onLogoutClick = { showDialog = DialogType.Logout }
                     )
                 }
-                // Botón flotante de inicio
                 Box(
                     modifier = Modifier
                         .offset(y = (-25).dp)
@@ -246,17 +237,40 @@ private fun PeliculaItem(pelicula: MediaItem, navigateToDetail: (Int) -> Unit) {
 fun Imagen(item: MediaItem, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
-    Image(
-        painter = rememberAsyncImagePainter(
-            model = item.poster,
-            imageLoader = ImageLoader.Builder(context).crossfade(true).build()
-        ),
-        contentDescription = null,
+    val painter = rememberAsyncImagePainter(
+        model = item.poster,
+        imageLoader = ImageLoader.Builder(context)
+            .crossfade(true)
+            .build()
+    )
+
+    val painterState = painter.state
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .then(modifier),
-        contentScale = ContentScale.Crop
-    )
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        if (painterState is AsyncImagePainter.State.Error || item.poster.isNullOrBlank()) {
+            Text(
+                text = "Poster no disponible",
+                color = Color.White,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .background(Color.Black.copy(alpha = 0.6f), shape = RoundedCornerShape(4.dp))
+                    .padding(8.dp)
+            )
+        }
+    }
 }
 
 @Composable

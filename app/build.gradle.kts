@@ -82,5 +82,4 @@ dependencies {
     implementation(libs.androidx.room.runtime)
 
     implementation ("androidx.core:core-splashscreen:1.0.0")
-
 }

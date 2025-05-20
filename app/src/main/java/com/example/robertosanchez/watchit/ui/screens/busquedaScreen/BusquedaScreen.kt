@@ -1,14 +1,14 @@
 package com.example.robertosanchez.watchit.ui.screens.busquedaScreen
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -104,77 +104,209 @@ fun BusquedaScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Campo de búsqueda
-                OutlinedTextField(
-                    value = pelicula,
-                    onValueChange = {
-                        pelicula = it
-                        showError = false
-                    },
+                Text(
+                    text = "Encuentra tus películas favoritas",
+                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center
+                )
+
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    placeholder = { Text("Buscar películas...") },
-                    leadingIcon = {
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = pelicula,
+                        onValueChange = {
+                            pelicula = it
+                            showError = false
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        placeholder = { Text("Buscar películas...") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Buscar",
+                                tint = Color.White
+                            )
+                        },
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            cursorColor = Color.White,
+                            focusedBorderColor = Color(0xFF3B82F6),
+                            unfocusedBorderColor = Color.White.copy(alpha = 0.6f)
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        isError = showError
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    IconButton(
+                        onClick = {
+                            if (pelicula.isNotBlank()) {
+                                navigateToBusquedaNombre(pelicula)
+                            } else {
+                                showError = true
+                            }
+                        },
+                        modifier = Modifier
+                            .size(56.dp)
+                            .background(Color(0xFF3B82F6), shape = RoundedCornerShape(12.dp))
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Buscar",
                             tint = Color.White
                         )
-                    },
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        cursorColor = Color.White,
-                        focusedBorderColor = Color(0xFF3B82F6),
-                        unfocusedBorderColor = Color.White.copy(alpha = 0.6f)
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    singleLine = true,
-                    isError = showError
-                )
+                    }
+                }
 
                 if (showError) {
                     Text(
                         text = "Por favor, introduce un término de búsqueda",
                         color = Color.Red,
                         fontSize = 12.sp,
-                        modifier = Modifier.padding(start = 16.dp)
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                     )
                 }
 
-                // Botón de búsqueda
-                Button(
-                    onClick = { 
-                        if (pelicula.isNotBlank()) {
-                            navigateToBusquedaNombre(pelicula)
-                        } else {
-                            showError = true
+                Column {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .height(100.dp)
+                            .background(Color(0xFF3B82F6), shape = RoundedCornerShape(12.dp))
+                            .clickable {  },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column (
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon (
+                                painterResource(R.drawable.upcoming),
+                                contentDescription = "Proximos estrenos",
+                                tint = Color.White
+                            )
+
+                            Text(
+                                text = "Proximos estrenos",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .padding(horizontal = 16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF3B82F6)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = "Buscar",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
+                    }
 
-                // Texto de ayuda
-                Text(
-                    text = "Encuentra tus películas favoritas",
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .height(100.dp)
+                            .background(Color(0xFF3B82F6), shape = RoundedCornerShape(12.dp))
+                            .clickable {  },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column (
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon (
+                                painterResource(R.drawable.upcoming_top),
+                                contentDescription = "Estrenos mas esperados",
+                                tint = Color.White
+                            )
+
+                            Text(
+                                text = "Estrenos más esperados",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .height(100.dp)
+                            .background(Color(0xFF3B82F6), shape = RoundedCornerShape(12.dp))
+                            .clickable {  },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column (
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon (
+                                painterResource(R.drawable.genres),
+                                contentDescription = "Géneros",
+                                tint = Color.White
+                            )
+
+                            Text(
+                                text = "Géneros",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .height(100.dp)
+                            .background(Color(0xFF3B82F6), shape = RoundedCornerShape(12.dp))
+                            .clickable {  },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column (
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Icon (
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Año de lanzamiento",
+                                tint = Color.White
+                            )
+
+                            Text(
+                                text = "Año de lanzamiento",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                }
             }
         }
     }

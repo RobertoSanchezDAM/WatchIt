@@ -1,15 +1,12 @@
 package com.example.robertosanchez.watchit.ui.screens.detailScreen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -33,14 +30,11 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
-import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
-import androidx.navigation.compose.rememberNavController
 import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
 import com.example.robertosanchez.watchit.ui.navegacion.Principal
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
-import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.text.style.TextAlign
 
 
@@ -136,7 +130,6 @@ fun DetailScreen(
                         onLogoutClick = { showDialog = DialogType.Logout }
                     )
                 }
-                // Botón flotante de inicio
                 Box(
                     modifier = Modifier
                         .offset(y = (-25).dp)
