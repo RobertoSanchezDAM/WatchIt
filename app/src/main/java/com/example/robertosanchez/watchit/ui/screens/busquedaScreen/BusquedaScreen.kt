@@ -33,7 +33,9 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 @Composable
 fun BusquedaScreen(
     auth: AuthManager,
-    navigateToBusquedaNombre: (String) -> Unit
+    navigateToBusquedaNombre: (String) -> Unit,
+    navigateToListaFecha: () -> Unit,
+    navigateToListaGenero: () -> Unit
 ) {
     val user = auth.getCurrentUser()
     var pelicula by remember { mutableStateOf("") }
@@ -248,7 +250,7 @@ fun BusquedaScreen(
                             .padding(horizontal = 16.dp)
                             .height(100.dp)
                             .background(Color(0xFF3B82F6), shape = RoundedCornerShape(12.dp))
-                            .clickable {  },
+                            .clickable { navigateToListaGenero() },
                         contentAlignment = Alignment.Center
                     ) {
                         Column (
@@ -281,7 +283,7 @@ fun BusquedaScreen(
                             .padding(horizontal = 16.dp)
                             .height(100.dp)
                             .background(Color(0xFF3B82F6), shape = RoundedCornerShape(12.dp))
-                            .clickable {  },
+                            .clickable { navigateToListaFecha() },
                         contentAlignment = Alignment.Center
                     ) {
                         Column (

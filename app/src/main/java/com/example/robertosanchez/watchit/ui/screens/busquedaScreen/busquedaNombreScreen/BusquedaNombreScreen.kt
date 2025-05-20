@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -52,16 +54,13 @@ fun BusquedaNombreScreen(
     auth: AuthManager,
     navigateToLogin: () -> Unit,
     navigateToDetail: (Int) -> Unit,
-    navigateToPrincipal: () -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val user = auth.getCurrentUser()
-    val navController = rememberNavController()
     var showDialog by remember { mutableStateOf<DialogType?>(null) }
 
     val lista_buscada by viewModel.lista.observeAsState(emptyList())
     val progressBar_buscada by viewModel.progressBar.observeAsState(false)
-
-    Log.d("PELICULAS LISTA", "PELICULAS LISTA: $lista_buscada")
 
     Scaffold(
         topBar = {
@@ -72,12 +71,24 @@ fun BusquedaNombreScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        IconButton(
+                            onClick = navigateBack,
+                            modifier = Modifier
+                                .align(Alignment.Top)
+                                .zIndex(1f)
+                        ) {
+                            Icon(
+                                Icons.Filled.ArrowBack,
+                                contentDescription = "Atrás",
+                                tint = Color.Black
+                            )
+                        }
+
                         Text(
                             text = "Resultado de búsqueda",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = Color.Black.copy(alpha = 0.8f),
-                            modifier = Modifier.padding(top = 8.dp)
+                            color = Color.Black.copy(alpha = 0.8f)
                         )
 
                         if (user?.photoUrl != null) {
@@ -114,44 +125,6 @@ fun BusquedaNombreScreen(
                     .height(56.dp)
                     .clip(CustomShape())
             )
-        },
-        bottomBar = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.TopCenter
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(BottomBarCustomShape())
-                        .background(Color(0xFF3B82F6))
-                ) {
-                    BottomNavigationBar(
-                        navController = navController,
-                        onLogoutClick = { showDialog = DialogType.Logout }
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .offset(y = (-25).dp)
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF2196F3))
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    IconButton(
-                        onClick = { navigateToPrincipal() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = "Inicio",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
-            }
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
@@ -191,9 +164,7 @@ fun BusquedaNombreScreen(
                 }
             } else {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    modifier = Modifier
-                        .padding(bottom = 15.dp)
+                    columns = GridCells.Fixed(4)
                 ) {
                     items(lista_buscada!!) { pelicula ->
                         PeliculaItem(pelicula, navigateToDetail)

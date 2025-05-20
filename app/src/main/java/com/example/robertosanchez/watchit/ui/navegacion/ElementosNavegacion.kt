@@ -31,3 +31,9 @@ object Busqueda
 
 @Serializable
 data class BusquedaNombreScreen(val pelicula: String)
+
+@Serializable
+object ListaFecha
+
+@Serializable
+object ListaGenero

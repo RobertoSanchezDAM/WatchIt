@@ -3,17 +3,18 @@ package com.example.robertosanchez.watchit.ui.screens.detailScreen
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -36,6 +37,14 @@ import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavor
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.robertosanchez.watchit.R
+import com.example.robertosanchez.watchit.data.AuthManager
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -46,9 +55,10 @@ fun DetailScreen(
     popularesViewModel: PeliculasPopularesViewModel,
     ratedViewModel: PeliculasRatedViewModel,
     anadirViewModel: PeliculasFavoritasViewModel,
-    navController: NavController
+    navigateBack: () -> Unit,
+    auth: AuthManager,
 ) {
-    var showDialog by remember { mutableStateOf<DialogType?>(null) }
+    val user = auth.getCurrentUser()
 
     val listaPopulares by popularesViewModel.lista.observeAsState(emptyList())
     val listaRated by ratedViewModel.lista.observeAsState(emptyList())
@@ -97,13 +107,59 @@ fun DetailScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "Detalles de la Película",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.Black.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = navigateBack,
+                            modifier = Modifier
+                                .align(Alignment.Top)
+                                .zIndex(1f)
+                        ) {
+                            Icon(
+                                Icons.Filled.ArrowBack,
+                                contentDescription = "Atrás",
+                                tint = Color.Black
+                            )
+                        }
+
+                        Text(
+                            text = "Detalles de la Película",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.Black.copy(alpha = 0.8f)
+                        )
+
+                        if (user?.photoUrl != null) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(user.photoUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = "Imagen",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .padding(top = 8.dp, end = 16.dp)
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .border(1.dp, Color.Black.copy(alpha = 0.6f), CircleShape)
+                                    .padding(1.dp)
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(R.drawable.profile),
+                                contentDescription = "Foto de perfil por defecto",
+                                modifier = Modifier
+                                    .padding(top = 8.dp, end = 16.dp)
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .border(2.dp, Color.Black.copy(alpha = 0.6f), CircleShape)
+                                    .padding(1.dp)
+                            )
+                        }
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF3B82F6),
@@ -113,44 +169,6 @@ fun DetailScreen(
                     .height(56.dp)
                     .clip(CustomShape())
             )
-        },
-        bottomBar = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.TopCenter
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(BottomBarCustomShape())
-                        .background(Color(0xFF3B82F6))
-                ) {
-                    BottomNavigationBar(
-                        navController = navController,
-                        onLogoutClick = { showDialog = DialogType.Logout }
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .offset(y = (-25).dp)
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF2196F3))
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    IconButton(
-                        onClick = { navController.navigate(Principal) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = "Inicio",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
-            }
         }
     ) {
         LazyColumn(
