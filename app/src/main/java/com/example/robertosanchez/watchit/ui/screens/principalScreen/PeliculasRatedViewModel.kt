@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.robertosanchez.proyectoapi.repositories.RemoteConnection
+import com.example.robertosanchez.watchit.repositories.RemoteConnection
 import com.example.robertosanchez.watchit.data.model.MediaItem
 import kotlinx.coroutines.launch
 

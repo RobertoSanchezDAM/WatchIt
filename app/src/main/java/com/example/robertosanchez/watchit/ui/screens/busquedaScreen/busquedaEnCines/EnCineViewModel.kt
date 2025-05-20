@@ -1,5 +1,7 @@
-package com.example.robertosanchez.watchit.ui.screens.busquedaScreen
+package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaEnCines
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.robertosanchez.watchit.data.model.MediaItem
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,9 +9,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.robertosanchez.watchit.repositories.RemoteConnection
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-class BusquedaViewModel(private var pelicula: String) : ViewModel() {
-
+@RequiresApi(Build.VERSION_CODES.O)
+class EnCineViewModel : ViewModel() {
     private val _lista: MutableLiveData<List<MediaItem>> = MutableLiveData()
     val lista: LiveData<List<MediaItem>> = _lista
 
@@ -17,25 +21,31 @@ class BusquedaViewModel(private var pelicula: String) : ViewModel() {
     val progressBar: LiveData<Boolean> = _progressBar
 
     init {
-        if (pelicula.isNotBlank()) {
-            buscarPeliculas(pelicula)
-        }
-    }
-
-    fun buscarPeliculas(pelicula: String) {
-        if (pelicula.isBlank()) return
-        
         _progressBar.value = true
         viewModelScope.launch {
-            val allMovies = mutableListOf<MediaItem>()
             try {
+                val allResults = mutableListOf<MediaItem>()
+
+                val hoy = LocalDate.now()
+                val haceDosSemanas = hoy.minusWeeks(2)
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
                 for (page in 1..5) {
-                    val response = RemoteConnection.service.buscarPeliculas(
-                        query = pelicula,
+                    val movies = RemoteConnection.service.peliculasEnCine(
                         apiKey = "49336a7ff05331f9880d3bc4f792f260",
                         page = page
                     )
-                    val mappedMovies = response.results.map {
+
+                    val filteredResults = movies.results.filter { it.release_date != null }.filter { movie ->
+                        try {
+                            val releaseDate = LocalDate.parse(movie.release_date, formatter)
+                            releaseDate in haceDosSemanas..hoy
+                        } catch (e: Exception) {
+                            false
+                        }
+                    }
+
+                    val mapped = filteredResults.map {
                         MediaItem(
                             it.id,
                             "https://image.tmdb.org/t/p/w185${it.poster_path}",
@@ -46,10 +56,11 @@ class BusquedaViewModel(private var pelicula: String) : ViewModel() {
                             it.genre_ids
                         )
                     }
-                    allMovies.addAll(mappedMovies)
+
+                    allResults.addAll(mapped)
                 }
 
-                _lista.value = allMovies
+                _lista.value = allResults
             } catch (e: Exception) {
                 _lista.value = _lista.value ?: emptyList()
             } finally {

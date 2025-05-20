@@ -1,7 +1,8 @@
-package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen
+package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaEnCines
 
 import android.annotation.SuppressLint
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,7 +14,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.zIndex
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
@@ -38,30 +39,24 @@ import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.data.model.MediaItem
-import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
-import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaViewModel
-import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
-import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BusquedaNombreScreen(
-    viewModel: BusquedaViewModel,
+fun EnCineScreen(
+    viewModel: EnCineViewModel,
     auth: AuthManager,
-    navigateToLogin: () -> Unit,
     navigateToDetail: (Int) -> Unit,
-    navigateToPrincipal: () -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val user = auth.getCurrentUser()
-    val navController = rememberNavController()
-    var showDialog by remember { mutableStateOf<DialogType?>(null) }
 
     val lista_buscada by viewModel.lista.observeAsState(emptyList())
     val progressBar_buscada by viewModel.progressBar.observeAsState(false)
 
-    Log.d("PELICULAS LISTA", "PELICULAS LISTA: $lista_buscada")
+    val añoActual = lista_buscada.firstOrNull()?.release_date?.take(4) ?: ""
 
     Scaffold(
         topBar = {
@@ -72,13 +67,27 @@ fun BusquedaNombreScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Resultado de búsqueda",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.Black.copy(alpha = 0.8f),
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
+                        IconButton(
+                            onClick = navigateBack,
+                            modifier = Modifier
+                                .align(Alignment.Top)
+                                .zIndex(1f)
+                        ) {
+                            Icon(
+                                Icons.Filled.ArrowBack,
+                                contentDescription = "Atrás",
+                                tint = Color.Black
+                            )
+                        }
+
+                        if (!progressBar_buscada) {
+                            Text(
+                                text = "Ya en cines",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.Black.copy(alpha = 0.8f)
+                            )
+                        }
 
                         if (user?.photoUrl != null) {
                             AsyncImage(
@@ -114,44 +123,6 @@ fun BusquedaNombreScreen(
                     .height(56.dp)
                     .clip(CustomShape())
             )
-        },
-        bottomBar = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.TopCenter
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(BottomBarCustomShape())
-                        .background(Color(0xFF3B82F6))
-                ) {
-                    BottomNavigationBar(
-                        navController = navController,
-                        onLogoutClick = { showDialog = DialogType.Logout }
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .offset(y = (-25).dp)
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF2196F3))
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    IconButton(
-                        onClick = { navigateToPrincipal() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = "Inicio",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
-            }
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
@@ -191,28 +162,13 @@ fun BusquedaNombreScreen(
                 }
             } else {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    modifier = Modifier
-                        .padding(bottom = 15.dp)
+                    columns = GridCells.Fixed(4)
                 ) {
                     items(lista_buscada!!) { pelicula ->
                         PeliculaItem(pelicula, navigateToDetail)
                     }
                 }
             }
-        }
-
-        when (showDialog) {
-            DialogType.Logout -> {
-                LogoutDialog(
-                    onDismiss = { showDialog = null },
-                    onConfirm = {
-                        auth.signOut()
-                        navigateToLogin()
-                    }
-                )
-            }
-            else -> Unit
         }
     }
 }
@@ -271,30 +227,4 @@ fun Imagen(item: MediaItem, modifier: Modifier = Modifier) {
             )
         }
     }
-}
-
-@Composable
-fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Color(0xFF2196F3),
-        title = { Text("Cerrar Sesión", color = Color.Black) },
-        text = { Text("¿Estás seguro de que deseas cerrar sesión?", color = Color.Black) },
-        confirmButton = {
-            Button(
-                onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E1E1E))
-            ) {
-                Text("Aceptar", color = Color.White)
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E1E1E))
-            ) {
-                Text("Cancelar", color = Color.White)
-            }
-        }
-    )
 }

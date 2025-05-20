@@ -1,7 +1,6 @@
 package com.example.robertosanchez.watchit.ui.navegacion
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -16,9 +15,16 @@ import com.example.robertosanchez.watchit.db.FirestoreManager
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaScreen
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaViewModel
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaViewModelFactory
-import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.ListaFechaScreen
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaEnCines.EnCineScreen
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaEnCines.EnCineViewModel
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.fechaScreen.ListaFechaScreen
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.ListaGeneroScreen
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.fechaScreen.FechaScreen
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.fechaScreen.FechaViewModel
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.fechaScreen.FechaViewModelFactory
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaNombreScreen.BusquedaNombreScreen
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaProximosEstrenos.ProximosEstrenosScreen
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaProximosEstrenos.ProximosEstrenosViewModel
 import com.example.robertosanchez.watchit.ui.screens.contrasenaOlvScreen.ContrasenaOlvScreen
 import com.example.robertosanchez.watchit.ui.screens.inicioScreen.InicioScreen
 import com.example.robertosanchez.watchit.ui.screens.detailScreen.DetailScreen
@@ -40,6 +46,8 @@ fun Navegacion(auth: AuthManager) {
     val context = LocalContext.current
     val popularesViewModel = remember { PeliculasPopularesViewModel() }
     val ratedViewModel = remember { PeliculasRatedViewModel() }
+    val proximosEstrenosViewModel = remember { ProximosEstrenosViewModel() }
+    val enCineViewModel = remember { EnCineViewModel() }
 
     val firestoreManager = FirestoreManager(auth, context)
     val peliculasFavoritasViewModel: PeliculasFavoritasViewModel = viewModel(
@@ -94,10 +102,12 @@ fun Navegacion(auth: AuthManager) {
                     navController.navigate(ListaLargaPeliculas(tipo.name))
                 },
                 navigateToBusquedaNombre = { pelicula ->
-                    navController.navigate(BusquedaNombreScreen(pelicula))
+                    navController.navigate(BusquedaNombre(pelicula))
                 },
                 navigateToListaFecha = { navController.navigate(ListaFecha) },
-                navigateToListaGenero = { navController.navigate(ListaGenero) }
+                navigateToListaGenero = { navController.navigate(ListaGenero) },
+                navigateToProximosEstrenos = { navController.navigate(ProximosEstrenos) },
+                navigateToEnCine = { navController.navigate(EnCines) }
             )
         }
 
@@ -141,14 +151,16 @@ fun Navegacion(auth: AuthManager) {
             BusquedaScreen(
                 auth = auth,
                 navigateToBusquedaNombre = { pelicula ->
-                    navController.navigate(BusquedaNombreScreen(pelicula))
+                    navController.navigate(BusquedaNombre(pelicula))
                 },
                 navigateToListaFecha = { navController.navigate(ListaFecha) },
-                navigateToListaGenero = { navController.navigate(ListaGenero) }
+                navigateToListaGenero = { navController.navigate(ListaGenero) },
+                navigateToProximosEstrenos = { navController.navigate(ProximosEstrenos) },
+                navigateToEnCines = {navController.navigate(EnCines)}
             )
         }
 
-        composable<BusquedaNombreScreen> { backStackEntry ->
+        composable<BusquedaNombre> { backStackEntry ->
             val pelicula = backStackEntry.arguments?.getString("pelicula") ?: ""
 
             val busquedaViewModel: BusquedaViewModel = viewModel(
@@ -158,7 +170,6 @@ fun Navegacion(auth: AuthManager) {
             BusquedaNombreScreen(
                 auth = auth,
                 viewModel = busquedaViewModel,
-                navigateToLogin = { navController.navigate(Login) },
                 navigateToDetail = { id ->
                     navController.navigate(Detail(id))
                 },
@@ -169,7 +180,9 @@ fun Navegacion(auth: AuthManager) {
         composable<ListaFecha> {
             ListaFechaScreen(
                 auth = auth,
-                navigateToBusquedaFecha = {  },
+                navigateToFecha = { fecha ->
+                    navController.navigate(Fecha(fecha))
+                },
                 navigateBack = { navController.popBackStack() },
             )
         }
@@ -182,5 +195,38 @@ fun Navegacion(auth: AuthManager) {
             )
         }
 
+        composable<Fecha> { backStackEntry ->
+            val detail = backStackEntry.toRoute<Fecha>()
+            val fecha = detail.fecha
+
+            val fechaViewModel: FechaViewModel = viewModel(
+                factory = FechaViewModelFactory(fecha)
+            )
+
+            FechaScreen(
+                auth = auth,
+                viewModel = fechaViewModel,
+                navigateToDetail = { id -> navController.navigate(Detail(id)) },
+                navigateBack = { navController.popBackStack() },
+            )
+        }
+
+        composable<ProximosEstrenos> {
+            ProximosEstrenosScreen(
+                viewModel = proximosEstrenosViewModel,
+                auth = auth,
+                navigateToDetail = { id -> navController.navigate(Detail(id)) },
+                navigateBack = { navController.popBackStack() },
+            )
+        }
+
+        composable<EnCines> {
+            EnCineScreen(
+                viewModel = enCineViewModel,
+                auth = auth,
+                navigateToDetail = { id -> navController.navigate(Detail(id)) },
+                navigateBack = { navController.popBackStack() },
+            )
+        }
     }
 }

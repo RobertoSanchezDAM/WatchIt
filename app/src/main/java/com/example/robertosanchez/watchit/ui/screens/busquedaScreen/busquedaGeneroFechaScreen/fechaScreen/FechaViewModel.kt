@@ -1,5 +1,6 @@
-package com.example.robertosanchez.watchit.ui.screens.busquedaScreen
+package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.fechaScreen
 
+import android.util.Log
 import com.example.robertosanchez.watchit.data.model.MediaItem
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.robertosanchez.watchit.repositories.RemoteConnection
 import kotlinx.coroutines.launch
 
-class BusquedaViewModel(private var pelicula: String) : ViewModel() {
+class FechaViewModel(private var fecha: Int) : ViewModel() {
 
     private val _lista: MutableLiveData<List<MediaItem>> = MutableLiveData()
     val lista: LiveData<List<MediaItem>> = _lista
@@ -17,23 +18,23 @@ class BusquedaViewModel(private var pelicula: String) : ViewModel() {
     val progressBar: LiveData<Boolean> = _progressBar
 
     init {
-        if (pelicula.isNotBlank()) {
-            buscarPeliculas(pelicula)
+        if (fecha != 0) {
+            buscarFecha(fecha)
         }
     }
 
-    fun buscarPeliculas(pelicula: String) {
-        if (pelicula.isBlank()) return
-        
+    fun buscarFecha(fecha: Int) {
+        if (fecha == 0) return
+
         _progressBar.value = true
         viewModelScope.launch {
             val allMovies = mutableListOf<MediaItem>()
             try {
-                for (page in 1..5) {
-                    val response = RemoteConnection.service.buscarPeliculas(
-                        query = pelicula,
+                for (page in 1..20) {
+                    val response = RemoteConnection.service.peliculaFecha(
                         apiKey = "49336a7ff05331f9880d3bc4f792f260",
-                        page = page
+                        page = page,
+                        year = fecha
                     )
                     val mappedMovies = response.results.map {
                         MediaItem(

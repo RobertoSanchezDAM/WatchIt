@@ -1,7 +1,6 @@
-package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaNombreScreen
+package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.fechaScreen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,7 +13,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,7 +29,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
@@ -40,14 +37,13 @@ import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.data.model.MediaItem
-import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaViewModel
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BusquedaNombreScreen(
-    viewModel: BusquedaViewModel,
+fun FechaScreen(
+    viewModel: FechaViewModel,
     auth: AuthManager,
     navigateToDetail: (Int) -> Unit,
     navigateBack: () -> Unit,
@@ -56,6 +52,8 @@ fun BusquedaNombreScreen(
 
     val lista_buscada by viewModel.lista.observeAsState(emptyList())
     val progressBar_buscada by viewModel.progressBar.observeAsState(false)
+
+    val añoActual = lista_buscada.firstOrNull()?.release_date?.take(4) ?: ""
 
     Scaffold(
         topBar = {
@@ -79,12 +77,14 @@ fun BusquedaNombreScreen(
                             )
                         }
 
-                        Text(
-                            text = "Resultado de búsqueda",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.Black.copy(alpha = 0.8f)
-                        )
+                        if (!progressBar_buscada) {
+                            Text(
+                                text = "Películas del $añoActual",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.Black.copy(alpha = 0.8f)
+                            )
+                        }
 
                         if (user?.photoUrl != null) {
                             AsyncImage(

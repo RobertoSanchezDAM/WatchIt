@@ -35,7 +35,9 @@ fun BusquedaScreen(
     auth: AuthManager,
     navigateToBusquedaNombre: (String) -> Unit,
     navigateToListaFecha: () -> Unit,
-    navigateToListaGenero: () -> Unit
+    navigateToListaGenero: () -> Unit,
+    navigateToProximosEstrenos: () -> Unit,
+    navigateToEnCines: () -> Unit
 ) {
     val user = auth.getCurrentUser()
     var pelicula by remember { mutableStateOf("") }
@@ -184,7 +186,7 @@ fun BusquedaScreen(
                             .padding(horizontal = 16.dp)
                             .height(100.dp)
                             .background(Color(0xFF3B82F6), shape = RoundedCornerShape(12.dp))
-                            .clickable {  },
+                            .clickable { navigateToProximosEstrenos() },
                         contentAlignment = Alignment.Center
                     ) {
                         Column (
@@ -201,7 +203,7 @@ fun BusquedaScreen(
                             )
 
                             Text(
-                                text = "Proximos estrenos",
+                                text = "Próximos estrenos",
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
@@ -217,7 +219,7 @@ fun BusquedaScreen(
                             .padding(horizontal = 16.dp)
                             .height(100.dp)
                             .background(Color(0xFF3B82F6), shape = RoundedCornerShape(12.dp))
-                            .clickable {  },
+                            .clickable { navigateToEnCines() },
                         contentAlignment = Alignment.Center
                     ) {
                         Column (
@@ -228,13 +230,13 @@ fun BusquedaScreen(
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             Icon (
-                                painterResource(R.drawable.upcoming_top),
-                                contentDescription = "Estrenos mas esperados",
+                                painterResource(R.drawable.theaters),
+                                contentDescription = "Ya en cine",
                                 tint = Color.White
                             )
 
                             Text(
-                                text = "Estrenos más esperados",
+                                text = "Ya en cine",
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold

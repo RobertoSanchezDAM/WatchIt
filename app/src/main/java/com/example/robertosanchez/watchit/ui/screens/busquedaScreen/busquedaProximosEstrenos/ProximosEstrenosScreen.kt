@@ -1,20 +1,22 @@
-package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen
+package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaProximosEstrenos
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,25 +25,33 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.AuthManager
+import com.example.robertosanchez.watchit.data.model.MediaItem
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
-import java.time.Year
 
-@RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaFechaScreen(
+fun ProximosEstrenosScreen(
+    viewModel: ProximosEstrenosViewModel,
     auth: AuthManager,
-    navigateToBusquedaFecha: (Int) -> Unit,
+    navigateToDetail: (Int) -> Unit,
     navigateBack: () -> Unit,
 ) {
     val user = auth.getCurrentUser()
+
+    val lista_buscada by viewModel.lista.observeAsState(emptyList())
+    val progressBar_buscada by viewModel.progressBar.observeAsState(false)
 
     Scaffold(
         topBar = {
@@ -66,7 +76,7 @@ fun ListaFechaScreen(
                         }
 
                         Text(
-                            text = "Año de Lanzamiento",
+                            text = "Próximos Estrenos",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.Black.copy(alpha = 0.8f)
@@ -108,56 +118,106 @@ fun ListaFechaScreen(
             )
         }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            ListaAños()
+        Box(modifier = Modifier.padding(paddingValues)) {
+            if (progressBar_buscada) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = Color(0xFF3B82F6),
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+            } else if (lista_buscada.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Sin resultados",
+                            tint = Color.White.copy(alpha = 0.6f),
+                            modifier = Modifier.size(64.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "No se encontraron películas",
+                            color = Color.White.copy(alpha = 0.6f),
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(4)
+                ) {
+                    items(lista_buscada!!) { pelicula ->
+                        PeliculaItem(pelicula, navigateToDetail)
+                    }
+                }
+            }
         }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ListaAños() {
-    val añoActual = Year.now().value
-    val años = (añoActual downTo 1870).toList()
-    val chunkedAños = años.chunked(4)
+private fun PeliculaItem(pelicula: MediaItem, navigateToDetail: (Int) -> Unit) {
+    Box(
+        modifier = Modifier
+            .width(140.dp)
+            .height(180.dp)
+            .clickable { navigateToDetail(pelicula.id) }
+            .border(
+                width = 0.5.dp,
+                color = Color.Gray.copy(alpha = 0.7f)
+            )
+    ) {
+        Imagen(item = pelicula)
+    }
+}
+
+@Composable
+fun Imagen(item: MediaItem, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
+    val painter = rememberAsyncImagePainter(
+        model = item.poster,
+        imageLoader = ImageLoader.Builder(context)
+            .crossfade(true)
+            .build()
+    )
+
+    val painterState = painter.state
 
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .then(modifier),
+        contentAlignment = Alignment.Center
     ) {
-        LazyColumn(
+        Image(
+            painter = painter,
+            contentDescription = null,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(chunkedAños) { rowYears ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    rowYears.forEach { year ->
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(2f)
-                                .background(Color(0xFF3B82F6), shape = RoundedCornerShape(12.dp))
-                                .padding(8.dp)
-                                .clickable {},
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = year.toString())
-                        }
-                    }
+            contentScale = ContentScale.Crop
+        )
 
-                    repeat(4 - rowYears.size) {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-            }
+        if (painterState is AsyncImagePainter.State.Error || item.poster.isNullOrBlank()) {
+            Text(
+                text = "Poster no disponible",
+                color = Color.White,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .background(Color.Black.copy(alpha = 0.6f), shape = RoundedCornerShape(4.dp))
+                    .padding(8.dp)
+            )
         }
     }
 }

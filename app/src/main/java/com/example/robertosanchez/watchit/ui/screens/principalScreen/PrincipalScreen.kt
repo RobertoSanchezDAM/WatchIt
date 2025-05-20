@@ -54,7 +54,9 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     navigateToListaLarga: (SeccionType) -> Unit,
                     navigateToBusquedaNombre: (String) -> Unit,
                     navigateToListaFecha: () -> Unit,
-                    navigateToListaGenero: () -> Unit
+                    navigateToListaGenero: () -> Unit,
+                    navigateToProximosEstrenos: () -> Unit,
+                    navigateToEnCine: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf<DialogType?>(null) }
     val navController = rememberNavController()
@@ -127,7 +129,9 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                         auth = auth,
                         navigateToBusquedaNombre = navigateToBusquedaNombre,
                         navigateToListaFecha = navigateToListaFecha,
-                        navigateToListaGenero = navigateToListaGenero
+                        navigateToListaGenero = navigateToListaGenero,
+                        navigateToProximosEstrenos = navigateToProximosEstrenos,
+                        navigateToEnCines = navigateToEnCine
                     )
                 }
                 composable(BottomNavItem.Watch.route) {

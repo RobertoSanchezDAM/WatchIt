@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.robertosanchez.proyectoapi.repositories.RemoteConnection
+import com.example.robertosanchez.watchit.repositories.RemoteConnection
 import com.example.robertosanchez.watchit.data.model.MediaItem
 import kotlinx.coroutines.launch
 
@@ -25,7 +25,7 @@ class PeliculasPopularesViewModel : ViewModel() {
             val allMovies = mutableListOf<MediaItem>()
             try {
                 for (page in 1..3) {
-                    val response = RemoteConnection.service.cancionesPopulares(
+                    val response = RemoteConnection.service.peliculasPopulares(
                         apiKey = "49336a7ff05331f9880d3bc4f792f260",
                         page = page
                     )

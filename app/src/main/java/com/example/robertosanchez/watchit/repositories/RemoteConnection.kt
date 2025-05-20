@@ -1,4 +1,4 @@
-package com.example.robertosanchez.proyectoapi.repositories
+package com.example.robertosanchez.watchit.repositories
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

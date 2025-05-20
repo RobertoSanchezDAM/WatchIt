@@ -93,7 +93,6 @@ fun ListaLargaPeliculasScreen(
                         IconButton(
                             onClick = navigateBack,
                             modifier = Modifier
-                                .align(Alignment.Top)
                                 .zIndex(1f)
                         ) {
                             Icon(
@@ -109,7 +108,7 @@ fun ListaLargaPeliculasScreen(
                                 "Rated" -> "Películas mejor Valoradas"
                                 else -> "Lista de Películas"
                             },
-                            fontSize = 18.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.Black.copy(alpha = 0.8f)
                         )

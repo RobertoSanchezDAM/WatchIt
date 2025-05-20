@@ -1,4 +1,4 @@
-package com.example.robertosanchez.watchit.ui.screens.busquedaScreen
+package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaProximosEstrenos
 
 import com.example.robertosanchez.watchit.data.model.MediaItem
 import androidx.lifecycle.LiveData
@@ -8,8 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.robertosanchez.watchit.repositories.RemoteConnection
 import kotlinx.coroutines.launch
 
-class BusquedaViewModel(private var pelicula: String) : ViewModel() {
-
+class ProximosEstrenosViewModel : ViewModel() {
     private val _lista: MutableLiveData<List<MediaItem>> = MutableLiveData()
     val lista: LiveData<List<MediaItem>> = _lista
 
@@ -17,25 +16,17 @@ class BusquedaViewModel(private var pelicula: String) : ViewModel() {
     val progressBar: LiveData<Boolean> = _progressBar
 
     init {
-        if (pelicula.isNotBlank()) {
-            buscarPeliculas(pelicula)
-        }
-    }
-
-    fun buscarPeliculas(pelicula: String) {
-        if (pelicula.isBlank()) return
-        
         _progressBar.value = true
         viewModelScope.launch {
-            val allMovies = mutableListOf<MediaItem>()
             try {
-                for (page in 1..5) {
-                    val response = RemoteConnection.service.buscarPeliculas(
-                        query = pelicula,
+                val allResults = mutableListOf<MediaItem>()
+
+                for (page in 1..20) {
+                    val movies = RemoteConnection.service.proximosEstrenos(
                         apiKey = "49336a7ff05331f9880d3bc4f792f260",
                         page = page
                     )
-                    val mappedMovies = response.results.map {
+                    val mapped = movies.results.map {
                         MediaItem(
                             it.id,
                             "https://image.tmdb.org/t/p/w185${it.poster_path}",
@@ -46,10 +37,10 @@ class BusquedaViewModel(private var pelicula: String) : ViewModel() {
                             it.genre_ids
                         )
                     }
-                    allMovies.addAll(mappedMovies)
+                    allResults.addAll(mapped)
                 }
 
-                _lista.value = allMovies
+                _lista.value = allResults
             } catch (e: Exception) {
                 _lista.value = _lista.value ?: emptyList()
             } finally {
