@@ -297,12 +297,12 @@ fun BusquedaScreen(
                         ) {
                             Icon (
                                 imageVector = Icons.Default.DateRange,
-                                contentDescription = "Año de lanzamiento",
+                                contentDescription = "Año de estreno",
                                 tint = Color.White
                             )
 
                             Text(
-                                text = "Año de lanzamiento",
+                                text = "Año de estreno",
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold

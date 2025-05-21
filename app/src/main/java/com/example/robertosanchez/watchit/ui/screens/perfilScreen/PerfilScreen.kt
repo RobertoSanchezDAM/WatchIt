@@ -70,8 +70,9 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 fun PerfilScreen(auth: AuthManager, anadirViewModel: PeliculasFavoritasViewModel) {
     val user = auth.getCurrentUser()
 
-    val uiState by anadirViewModel.uiState.collectAsState()
-    val peliculasAnadidas = uiState.peliculas
+    // AQUI
+    /*val uiState by anadirViewModel.uiState.collectAsState()
+    val peliculasAnadidas = uiState.peliculas*/
 
     Scaffold (
         topBar = {
@@ -182,7 +183,8 @@ fun PerfilScreen(auth: AuthManager, anadirViewModel: PeliculasFavoritasViewModel
                 color = Color.White.copy(alpha = 0.8f)
             )
 
-            peliculasAnadidas.forEach { pelicula ->
+            // AQUI
+            /*peliculasAnadidas.forEach { pelicula ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -201,7 +203,7 @@ fun PerfilScreen(auth: AuthManager, anadirViewModel: PeliculasFavoritasViewModel
                         modifier = Modifier.align(Alignment.CenterVertically)
                     )
                 }
-            }
+            }*/
 
         }
     }

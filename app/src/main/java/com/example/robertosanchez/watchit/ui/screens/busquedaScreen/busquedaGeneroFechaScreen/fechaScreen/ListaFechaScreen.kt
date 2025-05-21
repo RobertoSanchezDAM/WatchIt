@@ -67,7 +67,7 @@ fun ListaFechaScreen(
                         }
 
                         Text(
-                            text = "Año de Lanzamiento",
+                            text = "Año de estreno",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.Black.copy(alpha = 0.8f)
