@@ -168,7 +168,7 @@ fun PerfilScreen(auth: AuthManager, anadirViewModel: PeliculasFavoritasViewModel
             
             // Nombre del usuario
             Text(
-                text = user?.displayName ?: "Usuario",
+                text = if (user == null) "Anónimo" else (user.displayName ?: "Usuario"),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -178,7 +178,7 @@ fun PerfilScreen(auth: AuthManager, anadirViewModel: PeliculasFavoritasViewModel
             
             // Email del usuario
             Text(
-                text = user?.email ?: "Email no disponible",
+                text = if (user == null) "correo anónimo" else (user.email ?: "Email no disponible"),
                 fontSize = 16.sp,
                 color = Color.White.copy(alpha = 0.8f)
             )

@@ -30,7 +30,7 @@ class EnCineViewModel : ViewModel() {
                 val haceDosSemanas = hoy.minusWeeks(2)
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-                for (page in 1..5) {
+                for (page in 1..2) {
                     val movies = RemoteConnection.service.peliculasEnCine(
                         apiKey = "49336a7ff05331f9880d3bc4f792f260",
                         page = page
