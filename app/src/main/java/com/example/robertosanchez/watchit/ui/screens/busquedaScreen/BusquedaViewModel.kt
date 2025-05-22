@@ -27,16 +27,17 @@ class BusquedaViewModel(private var pelicula: String) : ViewModel() {
         
         _progressBar.value = true
         viewModelScope.launch {
-            val allMovies = mutableListOf<MediaItem>()
+            val allMovies = mutableMapOf<Int, MediaItem>()
             try {
-                for (page in 1..5) {
-                    val response = RemoteConnection.service.buscarPeliculas(
+                for (page in 1..3) {
+                    val responseES = RemoteConnection.service.buscarPeliculas(
                         query = pelicula,
                         apiKey = "49336a7ff05331f9880d3bc4f792f260",
+                        language = "es-ES",
                         page = page
                     )
-                    val mappedMovies = response.results.map {
-                        MediaItem(
+                    responseES.results.forEach {
+                        allMovies[it.id] = MediaItem(
                             it.id,
                             "https://image.tmdb.org/t/p/w185${it.poster_path}",
                             it.release_date,
@@ -46,10 +47,31 @@ class BusquedaViewModel(private var pelicula: String) : ViewModel() {
                             it.genre_ids
                         )
                     }
-                    allMovies.addAll(mappedMovies)
                 }
 
-                _lista.value = allMovies
+                for (page in 1..3) {
+                    val responseEN = RemoteConnection.service.buscarPeliculas(
+                        query = pelicula,
+                        apiKey = "49336a7ff05331f9880d3bc4f792f260",
+                        language = "en-US",
+                        page = page
+                    )
+                    responseEN.results.forEach {
+                        if (!allMovies.containsKey(it.id)) {
+                            allMovies[it.id] = MediaItem(
+                                it.id,
+                                "https://image.tmdb.org/t/p/w185${it.poster_path}",
+                                it.release_date,
+                                it.title,
+                                it.overview,
+                                "https://image.tmdb.org/t/p/w185${it.backdrop_path}",
+                                it.genre_ids
+                            )
+                        }
+                    }
+                }
+
+                _lista.value = allMovies.values.toList()
             } catch (e: Exception) {
                 _lista.value = _lista.value ?: emptyList()
             } finally {

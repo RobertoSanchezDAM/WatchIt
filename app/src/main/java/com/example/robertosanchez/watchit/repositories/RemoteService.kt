@@ -37,7 +37,8 @@ interface RemoteService {
         @Query("api_key") apiKey: String,
         @Query("language") language: String = "es-ES",
         @Query("page") page: Int = 1,
-        @Query("include_adult") includeAdult: Boolean = false
+        @Query("include_adult") includeAdult: Boolean = false,
+        @Query("include_original_language") includeOriginalLanguage: Boolean = true
     ): RemoteResult
 
     @GET("discover/movie")
