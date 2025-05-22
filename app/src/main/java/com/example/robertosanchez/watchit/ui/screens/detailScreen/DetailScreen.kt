@@ -176,7 +176,7 @@ fun DetailScreen(
                 .fillMaxSize(),
         ) {
             item {
-                pelicula?.let { pelicula ->
+                if (pelicula != null) {
                     Box(modifier = Modifier.fillMaxWidth()) {
                         val backdropPath = images?.backdrops?.maxByOrNull { it.width ?: 0 }?.file_path
                             ?: images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path
@@ -369,15 +369,18 @@ fun DetailScreen(
                             }
                         }
                     }
-                } ?: run {
+                } else {
                     Box(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "Película no encontrada",
                             color = Color.White,
-                            fontSize = 20.sp
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
