@@ -50,6 +50,16 @@ interface RemoteService {
         @Query("primary_release_year") year: Int,
     ): RemoteResult
 
+    @GET("discover/movie")
+    suspend fun peliculaGenero (
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = "es-ES",
+        @Query("page") page: Int = 1,
+        @Query("include_adult") includeAdult: Boolean = false,
+        @Query("sort_by") sort_by: String = "popularity.desc",
+        @Query("with_genres") genre: Int,
+    ): RemoteResult
+
     @GET("movie/upcoming")
     suspend fun proximosEstrenos(
         @Query("api_key") apiKey: String,

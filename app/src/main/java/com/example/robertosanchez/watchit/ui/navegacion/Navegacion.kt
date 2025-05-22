@@ -18,10 +18,13 @@ import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaView
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaEnCines.EnCineScreen
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaEnCines.EnCineViewModel
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.fechaScreen.ListaFechaScreen
-import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.ListaGeneroScreen
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.generoScreen.ListaGeneroScreen
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.fechaScreen.FechaScreen
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.fechaScreen.FechaViewModel
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.fechaScreen.FechaViewModelFactory
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.generoScreen.GeneroScreen
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.generoScreen.GeneroViewModel
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.generoScreen.GeneroViewModelFactory
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaNombreScreen.BusquedaNombreScreen
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaProximosEstrenos.ProximosEstrenosScreen
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaProximosEstrenos.ProximosEstrenosViewModel
@@ -190,7 +193,25 @@ fun Navegacion(auth: AuthManager) {
         composable<ListaGenero> {
             ListaGeneroScreen(
                 auth = auth,
-                navigateToBusquedaFecha = {  },
+                navigateToBusquedaFecha = { genero ->
+                    navController.navigate(Genero(genero))
+                },
+                navigateBack = { navController.popBackStack() },
+            )
+        }
+
+        composable<Genero> { backStackEntry ->
+            val detail = backStackEntry.toRoute<Genero>()
+            val genero = detail.genero
+
+            val generoViewModel: GeneroViewModel = viewModel(
+                factory = GeneroViewModelFactory(genero)
+            )
+
+            GeneroScreen(
+                auth = auth,
+                viewModel = generoViewModel,
+                navigateToDetail = { id -> navController.navigate(Detail(id)) },
                 navigateBack = { navController.popBackStack() },
             )
         }

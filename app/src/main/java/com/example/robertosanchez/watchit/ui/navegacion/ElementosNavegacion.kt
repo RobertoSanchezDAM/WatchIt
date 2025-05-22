@@ -42,6 +42,9 @@ data class Fecha(val fecha: Int)
 object ListaGenero
 
 @Serializable
+data class Genero(val genero: Int)
+
+@Serializable
 object ProximosEstrenos
 
 @Serializable

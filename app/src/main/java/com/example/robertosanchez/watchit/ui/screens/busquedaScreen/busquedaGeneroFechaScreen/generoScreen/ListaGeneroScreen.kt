@@ -1,7 +1,5 @@
-package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen
+package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.generoScreen
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -112,13 +110,15 @@ fun ListaGeneroScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            ListaGeneros()
+            ListaGeneros(navigateToGenero = { id -> navigateToBusquedaFecha(id) })
         }
     }
 }
 
 @Composable
-fun ListaGeneros() {
+fun ListaGeneros(
+    navigateToGenero: (Int) -> Unit
+) {
     val generos = mapOf(
         28 to "Acción",
         12 to "Aventura",
@@ -149,13 +149,13 @@ fun ListaGeneros() {
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(generoList) { (_, nombre) ->
+            items(generoList) { (id, nombre) ->
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp)
                         .background(Color(0xFF3B82F6), shape = RoundedCornerShape(12.dp))
-                        .clickable {}
+                        .clickable { navigateToGenero(id) }
                         .padding(8.dp),
                     contentAlignment = Alignment.Center
                 ) {
