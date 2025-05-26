@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.AlertDialog
@@ -37,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +60,8 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.R
+import com.example.robertosanchez.watchit.db.FirestoreManager
+import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
@@ -67,12 +71,19 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilScreen(auth: AuthManager, anadirViewModel: PeliculasFavoritasViewModel) {
+fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager) {
     val user = auth.getCurrentUser()
+    var peliculasFavoritas by remember { mutableStateOf<List<Pelicula>>(emptyList()) }
 
-    // AQUI
-    /*val uiState by anadirViewModel.uiState.collectAsState()
-    val peliculasAnadidas = uiState.peliculas*/
+    LaunchedEffect(user) {
+        if (user != null) {
+            firestore.getFavoriteMovies(user.uid).collect { peliculas ->
+                peliculasFavoritas = peliculas
+            }
+        } else {
+            peliculasFavoritas = emptyList()
+        }
+    }
 
     Scaffold (
         topBar = {
@@ -163,9 +174,9 @@ fun PerfilScreen(auth: AuthManager, anadirViewModel: PeliculasFavoritasViewModel
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             // Nombre del usuario
             Text(
                 text = if (user == null) "Anónimo" else (user.displayName ?: "Usuario"),
@@ -173,9 +184,9 @@ fun PerfilScreen(auth: AuthManager, anadirViewModel: PeliculasFavoritasViewModel
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             // Email del usuario
             Text(
                 text = if (user == null) "correo anónimo" else (user.email ?: "Email no disponible"),
@@ -183,27 +194,38 @@ fun PerfilScreen(auth: AuthManager, anadirViewModel: PeliculasFavoritasViewModel
                 color = Color.White.copy(alpha = 0.8f)
             )
 
-            // AQUI
-            /*peliculasAnadidas.forEach { pelicula ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                ) {
-                    pelicula.poster?.let { posterUrl ->
-                        Image(
-                            painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/w185$posterUrl"),
-                            contentDescription = "poster",
-                            modifier = Modifier.size(100.dp)
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(4) { index ->
+                    if (index < peliculasFavoritas.size) {
+                        val pelicula = peliculasFavoritas[index]
+                        Box(
+                            modifier = Modifier
+                                .size(width = 100.dp, height = 150.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        ) {
+                            pelicula.poster?.let { posterUrl ->
+                                AsyncImage(
+                                    model = "https://image.tmdb.org/t/p/w185$posterUrl",
+                                    contentDescription = "Poster de película",
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(width = 100.dp, height = 150.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.Gray.copy(alpha = 0.3f))
                         )
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "ID: ${pelicula.peliculaId}",
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
                 }
-            }*/
+            }
 
         }
     }

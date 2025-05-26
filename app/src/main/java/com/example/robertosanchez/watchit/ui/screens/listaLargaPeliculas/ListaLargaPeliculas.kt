@@ -150,78 +150,49 @@ fun ListaLargaPeliculasScreen(
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            NavHost(
-                navController = navController,
-                startDestination = BottomNavItem.Home.route
-            ) {
-                composable(BottomNavItem.Home.route) {
-                    when (seccion) {
-                        "Populares" -> {
-                            if (progressBar_populares) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            } else {
-                                LazyVerticalGrid(
-                                    columns = GridCells.Fixed(4)
-                                ) {
-                                    items(lista_populares!!) { pelicula ->
-                                        PeliculaItem(pelicula, navigateToDetail)
-                                    }
-                                }
-                            }
+            when (seccion) {
+                "Populares" -> {
+                    if (progressBar_populares) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
                         }
-
-                        "Rated" -> {
-                            if (progressBar_rated) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            } else {
-                                LazyVerticalGrid(
-                                    columns = GridCells.Fixed(4),
-                                    modifier = Modifier
-                                        .padding( bottom = 15.dp)
-                                ) {
-                                    items(lista_rated!!) { pelicula ->
-                                        PeliculaItem(pelicula, navigateToDetail)
-                                    }
-                                }
+                    } else {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(4)
+                        ) {
+                            items(lista_populares!!) { pelicula ->
+                                PeliculaItem(pelicula, navigateToDetail)
                             }
                         }
                     }
+                }
 
-                    when (showDialog) {
-                        DialogType.Logout -> {
-                            LogoutDialog(
-                                onDismiss = { showDialog = null },
-                                onConfirm = {
-                                    auth.signOut()
-                                    navigateToLogin()
-                                }
-                            )
+                "Rated" -> {
+                    if (progressBar_rated) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
                         }
-                        else -> Unit
+                    } else {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(4),
+                            modifier = Modifier
+                                .padding( bottom = 15.dp)
+                        ) {
+                            items(lista_rated!!) { pelicula ->
+                                PeliculaItem(pelicula, navigateToDetail)
+                            }
+                        }
                     }
-                }
-                composable(BottomNavItem.Search.route) {
-                    /*SearchContent()*/
-                }
-                composable(BottomNavItem.Watch.route) {
-                    /*WatchlistContent()*/
-                }
-                composable(BottomNavItem.Profile.route) {
-                    PerfilScreen(auth, favoritasViewModel)
                 }
             }
         }

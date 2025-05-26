@@ -97,7 +97,7 @@ fun Navegacion(auth: AuthManager) {
             PrincipalScreen(
                 popularesViewModel = popularesViewModel,
                 ratedViewModel = ratedViewModel,
-                favoritasViewModel = peliculasFavoritasViewModel,
+                firestore = firestoreManager,
                 auth = auth,
                 navigateToDetail = { id ->
                     navController.navigate(Detail(id))
@@ -135,7 +135,7 @@ fun Navegacion(auth: AuthManager) {
         composable<Perfil> {
             PerfilScreen(
                 auth = auth,
-                anadirViewModel = peliculasFavoritasViewModel
+                firestore = firestoreManager
             )
         }
 

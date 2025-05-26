@@ -34,6 +34,7 @@ import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.model.MediaItem
+import com.example.robertosanchez.watchit.db.FirestoreManager
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaScreen
@@ -47,7 +48,7 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 @Composable
 fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     ratedViewModel: PeliculasRatedViewModel,
-                    favoritasViewModel: PeliculasFavoritasViewModel,
+                    firestore: FirestoreManager,
                     auth: AuthManager,
                     navigateToLogin: () -> Unit,
                     navigateToDetail: (Int) -> Unit,
@@ -138,7 +139,7 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     /*WatchlistContent()*/
                 }
                 composable(BottomNavItem.Profile.route) {
-                    PerfilScreen(auth, favoritasViewModel)
+                    PerfilScreen(auth, firestore)
                 }
             }
         }
