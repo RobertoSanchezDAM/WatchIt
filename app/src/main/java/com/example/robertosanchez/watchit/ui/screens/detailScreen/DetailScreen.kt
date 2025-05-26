@@ -237,7 +237,7 @@ fun DetailScreen(
                                         .clip(RoundedCornerShape(8.dp))
                                 )
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.width(16.dp))
 
                                 Column {
                                     Text(
@@ -257,8 +257,13 @@ fun DetailScreen(
                                             )
                                         }
                                     }
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
                                     Text(pelicula.release_date, color = Color.LightGray, fontSize = 14.sp)
+
                                     Spacer(modifier = Modifier.height(8.dp))
+
                                     if (generosNombre.isNotEmpty()) {
                                         Text(
                                             text = generosNombre.joinToString(", "),
