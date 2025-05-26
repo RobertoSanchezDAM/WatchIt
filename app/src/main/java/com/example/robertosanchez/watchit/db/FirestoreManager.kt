@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
 import com.example.robertosanchez.watchit.db.Pelicula.PeliculaDB
+import com.example.robertosanchez.watchit.db.Usuario.UsuarioDB
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +40,12 @@ class FirestoreManager(auth: AuthManager, context: Context) {
 
     suspend fun deletePeliculaById(peliculaId: String) {
         firestore.collection("pelicula").document(peliculaId).delete().await()
+    }
+
+    // Usuarios
+    suspend fun guardarUsuario(uid: String) {
+        val userDocument = UsuarioDB(userId = uid)
+        firestore.collection("usuarios").document(uid).set(userDocument).await()
     }
 }
 

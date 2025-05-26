@@ -57,6 +57,7 @@ import androidx.compose.ui.zIndex
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.data.AuthRes
 import com.example.robertosanchez.watchit.R
+import com.example.robertosanchez.watchit.db.FirestoreManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.Dispatchers
@@ -66,6 +67,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun LoginScreen(
     auth: AuthManager,
+    firestoreManager: FirestoreManager,
     navigateToSignUp: () -> Unit,
     navigateToPrincipal: () -> Unit,
     navigateToContraseñaOlv: () -> Unit,
@@ -87,6 +89,9 @@ fun LoginScreen(
                     val firebaseUser = auth.googleSignInCredential(credential)
                     when (firebaseUser) {
                         is AuthRes.Success -> {
+                            firebaseUser.data?.uid?.let {
+                                firestoreManager.guardarUsuario(it)
+                            }
                             Toast.makeText(
                                 context,
                                 "Inicio de sesión correcto",
@@ -198,7 +203,7 @@ fun LoginScreen(
                     Button(
                         onClick = {
                             scope.launch {
-                                signAnonimous(auth, navigateToPrincipal, context)
+                                signAnonimous(auth, navigateToPrincipal, context, firestoreManager)
                             }
                         },
                         modifier = Modifier.size(width = 40.dp, height = 40.dp),
@@ -263,7 +268,7 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         scope.launch {
-                            signIn(email, password, context, auth, navigateToPrincipal)
+                            signIn(email, password, context, auth, navigateToPrincipal, firestoreManager)
                         }
                     },
                     modifier = Modifier
@@ -305,7 +310,7 @@ fun LoginScreen(
 }
 
 
-suspend fun signAnonimous(auth: AuthManager, navigateToPrincipal: () -> Unit, context: Context) {
+suspend fun signAnonimous(auth: AuthManager, navigateToPrincipal: () -> Unit, context: Context, firestoreManager: FirestoreManager) {
     val res = withContext(Dispatchers.IO) {
         auth.signInAnonymously()
     }
@@ -320,7 +325,7 @@ suspend fun signAnonimous(auth: AuthManager, navigateToPrincipal: () -> Unit, co
     }
 }
 
-suspend fun signIn(email: String, password: String, context: Context, auth: AuthManager, navigateToPrincipal: () -> Unit) {
+suspend fun signIn(email: String, password: String, context: Context, auth: AuthManager, navigateToPrincipal: () -> Unit, firestoreManager: FirestoreManager) {
     if (email.isNotEmpty() && password.isNotEmpty()) {
         val result =
             withContext(Dispatchers.IO) {
@@ -328,6 +333,9 @@ suspend fun signIn(email: String, password: String, context: Context, auth: Auth
             }
             when (result) {
                 is AuthRes.Success -> {
+                    result.data?.uid?.let {
+                        firestoreManager.guardarUsuario(it)
+                    }
                     Toast.makeText(context, "Inicio de sesión correcto", Toast.LENGTH_SHORT).show()
                     navigateToPrincipal()
                 }

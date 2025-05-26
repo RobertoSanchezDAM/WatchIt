@@ -50,13 +50,14 @@ import androidx.compose.ui.unit.sp
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.data.AuthRes
 import com.example.robertosanchez.watchit.R
+import com.example.robertosanchez.watchit.db.FirestoreManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
 @Composable
-fun RegistroScreen(auth: AuthManager, navigateToHome: () -> Unit) {
+fun RegistroScreen(auth: AuthManager, firestoreManager: FirestoreManager, navigateToHome: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -149,7 +150,7 @@ fun RegistroScreen(auth: AuthManager, navigateToHome: () -> Unit) {
                 Button(
                     onClick = {
                         scope.launch {
-                            signUp(navigateToHome, auth, email, password, context)
+                            signUp(navigateToHome, auth, email, password, context, firestoreManager)
                         }
                     },
                     modifier = Modifier
@@ -195,7 +196,8 @@ suspend fun signUp(
     auth: AuthManager,
     email: String,
     password: String,
-    context: Context
+    context: Context,
+    firestoreManager: FirestoreManager
 ) {
     if (email.isNotEmpty() && password.isNotEmpty()) {
         when (
@@ -204,6 +206,9 @@ suspend fun signUp(
             }
         ) {
             is AuthRes.Success -> {
+                result.data?.uid?.let {
+                    firestoreManager.guardarUsuario(it)
+                }
                 Toast.makeText(context, "Usuario creado", Toast.LENGTH_SHORT).show()
                 navigateToHome()
             }

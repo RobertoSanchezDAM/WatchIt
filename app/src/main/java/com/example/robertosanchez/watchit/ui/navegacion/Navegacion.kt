@@ -68,6 +68,7 @@ fun Navegacion(auth: AuthManager) {
         composable<Login> {
             LoginScreen(
                 auth,
+                firestoreManager,
                 { navController.navigate(Registro) },
                 {
                     navController.navigate(Principal) {
@@ -80,7 +81,8 @@ fun Navegacion(auth: AuthManager) {
 
         composable<Registro> {
             RegistroScreen(
-                auth
+                auth,
+                firestoreManager
             ) { navController.popBackStack() }
         }
 
