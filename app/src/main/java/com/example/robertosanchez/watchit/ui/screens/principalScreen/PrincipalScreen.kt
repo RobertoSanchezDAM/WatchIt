@@ -139,7 +139,7 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     /*WatchlistContent()*/
                 }
                 composable(BottomNavItem.Profile.route) {
-                    PerfilScreen(auth, firestore)
+                    PerfilScreen(auth, firestore, navigateToDetail)
                 }
             }
         }

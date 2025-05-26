@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,7 +72,7 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager) {
+fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager, navigateToDetail: (Int) -> Unit) {
     val user = auth.getCurrentUser()
     var peliculasFavoritas by remember { mutableStateOf<List<Pelicula>>(emptyList()) }
 
@@ -194,19 +195,24 @@ fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager) {
                 color = Color.White.copy(alpha = 0.8f)
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
             LazyRow(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 items(4) { index ->
                     if (index < peliculasFavoritas.size) {
                         val pelicula = peliculasFavoritas[index]
                         Box(
                             modifier = Modifier
-                                .size(width = 100.dp, height = 150.dp)
-                                .clip(RoundedCornerShape(8.dp))
+                                .size(width = 80.dp, height = 120.dp)
+                                .clickable { navigateToDetail(pelicula.peliculaId) }
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Gray.copy(alpha = 0.7f)
+                                )
                         ) {
                             pelicula.poster?.let { posterUrl ->
                                 AsyncImage(
@@ -219,10 +225,15 @@ fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager) {
                     } else {
                         Box(
                             modifier = Modifier
-                                .size(width = 100.dp, height = 150.dp)
-                                .clip(RoundedCornerShape(8.dp))
+                                .size(width = 80.dp, height = 120.dp)
                                 .background(Color.Gray.copy(alpha = 0.3f))
-                        )
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Gray.copy(alpha = 0.7f)
+                                )
+                        ) {
+                            // Vacio
+                        }
                     }
                 }
             }

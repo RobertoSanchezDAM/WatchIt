@@ -135,7 +135,10 @@ fun Navegacion(auth: AuthManager) {
         composable<Perfil> {
             PerfilScreen(
                 auth = auth,
-                firestore = firestoreManager
+                firestore = firestoreManager,
+                navigateToDetail = { id ->
+                    navController.navigate(Detail(id))
+                }
             )
         }
 
