@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -54,11 +55,13 @@ fun DetailScreen(
     id: Int,
     popularesViewModel: PeliculasPopularesViewModel,
     ratedViewModel: PeliculasRatedViewModel,
-    anadirViewModel: PeliculasFavoritasViewModel,
+    peliculasFavoritasViewModel: PeliculasFavoritasViewModel,
     navigateBack: () -> Unit,
     auth: AuthManager,
 ) {
     val user = auth.getCurrentUser()
+    val scope = rememberCoroutineScope()
+    val isFavorite by peliculasFavoritasViewModel.isFavorite(id.toString()).collectAsState(initialValue = false)
 
     val listaPopulares by popularesViewModel.lista.observeAsState(emptyList())
     val listaRated by ratedViewModel.lista.observeAsState(emptyList())
@@ -225,12 +228,40 @@ fun DetailScreen(
                                 )
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Column {
-                                    Text(
-                                        pelicula.title,
-                                        color = Color.White,
-                                        fontSize = 28.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            pelicula.title,
+                                            color = Color.White,
+                                            fontSize = 28.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        IconButton(onClick = {
+                                            if (pelicula != null) {
+                                                if (isFavorite) {
+                                                    peliculasFavoritasViewModel.removeFavoriteMovie(
+                                                        Pelicula(
+                                                            peliculaId = pelicula.id,
+                                                            poster = pelicula.poster
+                                                        )
+                                                    )
+                                                } else {
+                                                    peliculasFavoritasViewModel.addFavoriteMovie(
+                                                        Pelicula(
+                                                            peliculaId = pelicula.id,
+                                                            poster = pelicula.poster
+                                                        )
+                                                    )
+                                                }
+                                            }
+                                        }) {
+                                            Icon(
+                                                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                                contentDescription = if (isFavorite) "Eliminar de favoritos" else "Añadir a favoritos",
+                                                tint = if (isFavorite) Color.Red else Color.Gray
+                                            )
+                                        }
+                                    }
                                     credits?.let { cr ->
                                         val director = cr.crew.find { it.job == "Director" }
                                         director?.let {
@@ -251,26 +282,6 @@ fun DetailScreen(
                                         )
                                     }
                                 }
-                            }
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            IconButton(
-                                onClick = {
-                                    anadirViewModel.addPelicula(
-                                        Pelicula(
-                                            id = "",
-                                            peliculaId = pelicula.id,
-                                            poster = pelicula.poster
-                                        )
-                                    )
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Favorite,
-                                    contentDescription = "Añadir a favoritas",
-                                    tint = Color.Red
-                                )
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))

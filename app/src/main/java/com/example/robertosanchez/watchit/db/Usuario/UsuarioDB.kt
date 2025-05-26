@@ -13,6 +13,5 @@ data class UsuarioDB(
     val peliculasPorVer: List<PeliculaVer> = listOf(),
     val numPeliculasVistas: Int = 0,
     val valoracionMedia: Int = 0,
-    val peliculasFavoritas: List<Pelicula> = listOf()
 )
 

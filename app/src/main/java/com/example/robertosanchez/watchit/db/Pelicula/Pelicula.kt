@@ -1,7 +1,7 @@
 package com.example.robertosanchez.watchit.db.Pelicula
 
 data class Pelicula(
-    val id: String,
-    val peliculaId: Int,
-    val poster: String?
+    val id: String = "",
+    val peliculaId: Int = 0,
+    val poster: String? = null
 )

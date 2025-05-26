@@ -10,5 +10,4 @@ data class Usuario(
     val peliculasPorVer: MutableList<PeliculaVer>,
     val numPeliculasVistas: Int,
     val valoracionMedia: Int,
-    val peliculasFavoritas: MutableList<Pelicula>
 )

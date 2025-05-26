@@ -54,7 +54,7 @@ fun Navegacion(auth: AuthManager) {
 
     val firestoreManager = FirestoreManager(auth, context)
     val peliculasFavoritasViewModel: PeliculasFavoritasViewModel = viewModel(
-        factory = PeliculasFavoritasViewModelFactory(firestoreManager)
+        factory = PeliculasFavoritasViewModelFactory(firestoreManager, auth)
     )
 
     NavHost(navController = navController, startDestination = Inicio) {
@@ -146,7 +146,7 @@ fun Navegacion(auth: AuthManager) {
                 id = id,
                 popularesViewModel = popularesViewModel,
                 ratedViewModel = ratedViewModel,
-                anadirViewModel = peliculasFavoritasViewModel,
+                peliculasFavoritasViewModel = peliculasFavoritasViewModel,
                 navigateBack = { navController.popBackStack() },
                 auth = auth,
             )

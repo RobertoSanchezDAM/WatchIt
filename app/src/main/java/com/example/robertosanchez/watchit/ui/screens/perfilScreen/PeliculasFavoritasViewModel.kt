@@ -1,52 +1,51 @@
 package com.example.robertosanchez.watchit.ui.screens.perfilScreen
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.db.FirestoreManager
 import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class PeliculasFavoritasViewModel(private val firestore: FirestoreManager) : ViewModel() {
+class PeliculasFavoritasViewModel(private val firestore: FirestoreManager, private val authManager: AuthManager) : ViewModel() {
     private val _uiState = MutableStateFlow(UiState())
-    val uiState: StateFlow<UiState> = _uiState
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            firestore.getPeliculasTransactions().collect { pelicula ->
-                _uiState.update { uiState ->
-                    uiState.copy(peliculas = pelicula, isLoading = false)
+            authManager.getCurrentUser()?.uid?.let { userId ->
+                firestore.getFavoriteMovies(userId).collect {
+                    _uiState.update { uiState -> uiState.copy(peliculas = it, isLoading = false) }
                 }
             }
         }
     }
 
-    // Peliculas
-    fun addPelicula(pelicula: Pelicula) {
+    fun addFavoriteMovie(movie: Pelicula) {
         viewModelScope.launch {
-            firestore.addPelicula(pelicula)
-            firestore.getPeliculasTransactions().collect { pelicula ->
-                _uiState.update { uiState -> uiState.copy(peliculas = pelicula) }
+            authManager.getCurrentUser()?.uid?.let { userId ->
+                firestore.addFavoriteMovie(userId, movie)
             }
         }
     }
 
-    fun deletePeliculaById(peliculaId: String) {
-        if (peliculaId.isEmpty()) return
+    fun removeFavoriteMovie(movie: Pelicula) {
         viewModelScope.launch {
-            firestore.deletePeliculaById(peliculaId)
-            firestore.getPeliculasTransactions().collect { pelicula ->
-                _uiState.update { uiState -> uiState.copy(peliculas = pelicula) }
+            authManager.getCurrentUser()?.uid?.let { userId ->
+                firestore.removeFavoriteMovie(userId, movie)
             }
         }
     }
+
 }
 
 data class UiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val peliculas: List<Pelicula> = emptyList(),
     val showAddNoteDialog: Boolean = false,
     val showLogoutDialog: Boolean = false
