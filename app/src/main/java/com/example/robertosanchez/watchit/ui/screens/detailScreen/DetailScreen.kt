@@ -68,9 +68,14 @@ fun DetailScreen(
 ) {
     val user = auth.getCurrentUser()
     val scope = rememberCoroutineScope()
-    val isFavorite by peliculasFavoritasViewModel.isFavorite(id.toString()).collectAsState(false)
+    val isFavorite = peliculasFavoritasViewModel.isFavorite(id)
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    var localFavoriteState by remember { mutableStateOf(isFavorite) }
+
+    LaunchedEffect(isFavorite) {
+        localFavoriteState = isFavorite
+    }
 
     val listaPopulares by popularesViewModel.lista.observeAsState(emptyList())
     val listaRated by ratedViewModel.lista.observeAsState(emptyList())
@@ -278,7 +283,8 @@ fun DetailScreen(
 
                             IconButton(onClick = {
                                 if (pelicula != null) {
-                                    if (isFavorite) {
+                                    if (localFavoriteState) {
+                                        localFavoriteState = false
                                         peliculasFavoritasViewModel.removeFavoriteMovie(
                                             Pelicula(
                                                 peliculaId = pelicula.id,
@@ -288,13 +294,24 @@ fun DetailScreen(
                                         Toast.makeText(context, "Película eliminada de favoritos", Toast.LENGTH_SHORT).show()
                                     } else {
                                         if (peliculasFavoritasViewModel.canAddMoreFavorites()) {
-                                            peliculasFavoritasViewModel.addFavoriteMovie(
+                                            localFavoriteState = true
+                                            val success = peliculasFavoritasViewModel.addFavoriteMovie(
                                                 Pelicula(
                                                     peliculaId = pelicula.id,
                                                     poster = pelicula.poster
                                                 )
                                             )
-                                            Toast.makeText(context, "Película añadida a favoritos", Toast.LENGTH_SHORT).show()
+                                            if (success) {
+                                                Toast.makeText(context, "Película añadida a favoritos", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                localFavoriteState = false
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar(
+                                                        message = "No se pudo añadir la película a favoritos",
+                                                        duration = SnackbarDuration.Short
+                                                    )
+                                                }
+                                            }
                                         } else {
                                             scope.launch {
                                                 snackbarHostState.showSnackbar(
@@ -307,9 +324,9 @@ fun DetailScreen(
                                 }
                             }) {
                                 Icon(
-                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                                    contentDescription = if (isFavorite) "Eliminar de favoritos" else "Añadir a favoritos",
-                                    tint = if (isFavorite) Color.Red else Color.Gray
+                                    imageVector = if (localFavoriteState) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                    contentDescription = if (localFavoriteState) "Eliminar de favoritos" else "Añadir a favoritos",
+                                    tint = if (localFavoriteState) Color.Red else Color.Gray
                                 )
                             }
 
