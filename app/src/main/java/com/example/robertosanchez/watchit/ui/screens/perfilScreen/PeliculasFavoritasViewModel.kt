@@ -26,11 +26,16 @@ class PeliculasFavoritasViewModel(private val firestore: FirestoreManager, priva
         }
     }
 
-    fun addFavoriteMovie(movie: Pelicula) {
-        viewModelScope.launch {
-            authManager.getCurrentUser()?.uid?.let { userId ->
-                firestore.addFavoriteMovie(userId, movie)
+    fun addFavoriteMovie(movie: Pelicula): Boolean {
+        return if (_uiState.value.peliculas.size < 4) {
+            viewModelScope.launch {
+                authManager.getCurrentUser()?.uid?.let { userId ->
+                    firestore.addFavoriteMovie(userId, movie)
+                }
             }
+            true
+        } else {
+            false
         }
     }
 
@@ -42,6 +47,19 @@ class PeliculasFavoritasViewModel(private val firestore: FirestoreManager, priva
         }
     }
 
+    fun isFavorite(movieId: String): StateFlow<Boolean> {
+        val isFav = MutableStateFlow(false)
+        viewModelScope.launch {
+            _uiState.collect { uiState ->
+                isFav.value = uiState.peliculas.any { it.peliculaId.toString() == movieId }
+            }
+        }
+        return isFav
+    }
+
+    fun canAddMoreFavorites(): Boolean {
+        return _uiState.value.peliculas.size < 4
+    }
 }
 
 data class UiState(

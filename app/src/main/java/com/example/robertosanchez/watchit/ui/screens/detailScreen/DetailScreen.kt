@@ -1,6 +1,7 @@
 package com.example.robertosanchez.watchit.ui.screens.detailScreen
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,6 +47,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.AuthManager
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -61,7 +68,9 @@ fun DetailScreen(
 ) {
     val user = auth.getCurrentUser()
     val scope = rememberCoroutineScope()
-    val isFavorite by peliculasFavoritasViewModel.isFavorite(id.toString()).collectAsState(initialValue = false)
+    val isFavorite by peliculasFavoritasViewModel.isFavorite(id.toString()).collectAsState(false)
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     val listaPopulares by popularesViewModel.lista.observeAsState(emptyList())
     val listaRated by ratedViewModel.lista.observeAsState(emptyList())
@@ -107,6 +116,7 @@ fun DetailScreen(
     val generosNombre = generosId.mapNotNull { generos[it] }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -226,42 +236,17 @@ fun DetailScreen(
                                         .height(150.dp)
                                         .clip(RoundedCornerShape(8.dp))
                                 )
-                                Spacer(modifier = Modifier.width(16.dp))
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
                                 Column {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
-                                            pelicula.title,
-                                            color = Color.White,
-                                            fontSize = 28.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.weight(1f)
-                                        )
-                                        IconButton(onClick = {
-                                            if (pelicula != null) {
-                                                if (isFavorite) {
-                                                    peliculasFavoritasViewModel.removeFavoriteMovie(
-                                                        Pelicula(
-                                                            peliculaId = pelicula.id,
-                                                            poster = pelicula.poster
-                                                        )
-                                                    )
-                                                } else {
-                                                    peliculasFavoritasViewModel.addFavoriteMovie(
-                                                        Pelicula(
-                                                            peliculaId = pelicula.id,
-                                                            poster = pelicula.poster
-                                                        )
-                                                    )
-                                                }
-                                            }
-                                        }) {
-                                            Icon(
-                                                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                                                contentDescription = if (isFavorite) "Eliminar de favoritos" else "Añadir a favoritos",
-                                                tint = if (isFavorite) Color.Red else Color.Gray
-                                            )
-                                        }
-                                    }
+                                    Text(
+                                        pelicula.title,
+                                        color = Color.White,
+                                        fontSize = 28.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+
                                     credits?.let { cr ->
                                         val director = cr.crew.find { it.job == "Director" }
                                         director?.let {
@@ -282,6 +267,45 @@ fun DetailScreen(
                                         )
                                     }
                                 }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            IconButton(onClick = {
+                                if (pelicula != null) {
+                                    if (isFavorite) {
+                                        peliculasFavoritasViewModel.removeFavoriteMovie(
+                                            Pelicula(
+                                                peliculaId = pelicula.id,
+                                                poster = pelicula.poster
+                                            )
+                                        )
+                                        Toast.makeText(context, "Película eliminada de favoritos", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        if (peliculasFavoritasViewModel.canAddMoreFavorites()) {
+                                            peliculasFavoritasViewModel.addFavoriteMovie(
+                                                Pelicula(
+                                                    peliculaId = pelicula.id,
+                                                    poster = pelicula.poster
+                                                )
+                                            )
+                                            Toast.makeText(context, "Película añadida a favoritos", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(
+                                                    message = "No puedes añadir más de 4 películas favoritas",
+                                                    duration = SnackbarDuration.Short
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }) {
+                                Icon(
+                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                    contentDescription = if (isFavorite) "Eliminar de favoritos" else "Añadir a favoritos",
+                                    tint = if (isFavorite) Color.Red else Color.Gray
+                                )
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
