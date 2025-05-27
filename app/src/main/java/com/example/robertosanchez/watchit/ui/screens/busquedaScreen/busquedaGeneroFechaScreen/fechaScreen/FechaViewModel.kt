@@ -1,6 +1,5 @@
 package com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaGeneroFechaScreen.fechaScreen
 
-import android.util.Log
 import com.example.robertosanchez.watchit.data.model.MediaItem
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
@@ -33,13 +32,9 @@ import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasPo
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasRatedViewModel
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
-import com.example.robertosanchez.watchit.ui.navegacion.Principal
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
-import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.Alignment

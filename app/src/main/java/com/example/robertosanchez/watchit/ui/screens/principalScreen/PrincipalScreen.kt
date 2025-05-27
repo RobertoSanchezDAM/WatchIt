@@ -38,7 +38,6 @@ import com.example.robertosanchez.watchit.db.FirestoreManager
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavigationBar
 import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaScreen
-import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PerfilScreen
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListScreen
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
