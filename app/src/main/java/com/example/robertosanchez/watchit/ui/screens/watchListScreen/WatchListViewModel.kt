@@ -1,6 +1,5 @@
-package com.example.robertosanchez.watchit.ui.screens.perfilScreen
+package com.example.robertosanchez.watchit.ui.screens.watchListScreen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -13,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class PeliculasFavoritasViewModel(
+class WatchListViewModel(
     private val firestore: FirestoreManager,
     private val authManager: AuthManager
 ) : ViewModel() {
@@ -21,18 +20,18 @@ class PeliculasFavoritasViewModel(
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     init {
-        loadFavorites()
+        loadWatchList()
     }
 
-    private fun loadFavorites() {
+    private fun loadWatchList() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val currentUserId = authManager.getCurrentUser()?.uid
-            
+
             if (currentUserId != null) {
                 try {
-                    firestore.getFavoriteMovies(currentUserId).collect { peliculas ->
-                        _uiState.update { uiState -> 
+                    firestore.getWacthList(currentUserId).collect { peliculas ->
+                        _uiState.update { uiState ->
                             uiState.copy(
                                 peliculas = peliculas.take(4),
                                 isLoading = false
@@ -48,14 +47,10 @@ class PeliculasFavoritasViewModel(
         }
     }
 
-    fun addFavoriteMovie(movie: Pelicula): Boolean {
+    fun addWatchList(movie: Pelicula): Boolean {
         val currentUserId = authManager.getCurrentUser()?.uid
-        
-        if (currentUserId == null) {
-            return false
-        }
 
-        if (_uiState.value.peliculas.size >= 4) {
+        if (currentUserId == null) {
             return false
         }
 
@@ -71,7 +66,7 @@ class PeliculasFavoritasViewModel(
 
         viewModelScope.launch {
             try {
-                firestore.addFavoriteMovie(currentUserId, movie)
+                firestore.addWatchList(currentUserId, movie)
             } catch (e: Exception) {
                 _uiState.update { currentState ->
                     currentState.copy(
@@ -83,9 +78,9 @@ class PeliculasFavoritasViewModel(
         return true
     }
 
-    fun removeFavoriteMovie(movie: Pelicula) {
+    fun removeWatchList(movie: Pelicula) {
         val currentUserId = authManager.getCurrentUser()?.uid
-        
+
         if (currentUserId != null) {
             _uiState.update { currentState ->
                 currentState.copy(
@@ -95,7 +90,7 @@ class PeliculasFavoritasViewModel(
 
             viewModelScope.launch {
                 try {
-                    firestore.removeFavoriteMovie(currentUserId, movie)
+                    firestore.removeWatchList(currentUserId, movie)
                 } catch (e: Exception) {
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -107,12 +102,8 @@ class PeliculasFavoritasViewModel(
         }
     }
 
-    fun isFavorite(movieId: Int): Boolean {
+    fun isWatched(movieId: Int): Boolean {
         return _uiState.value.peliculas.any { it.peliculaId == movieId }
-    }
-
-    fun canAddMoreFavorites(): Boolean {
-        return _uiState.value.peliculas.size < 4
     }
 }
 
@@ -122,3 +113,4 @@ data class UiState(
     val showAddNoteDialog: Boolean = false,
     val showLogoutDialog: Boolean = false
 )
+

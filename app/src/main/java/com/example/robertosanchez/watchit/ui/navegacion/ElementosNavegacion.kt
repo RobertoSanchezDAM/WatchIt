@@ -30,6 +30,9 @@ data class Detail(val id: Int)
 object Busqueda
 
 @Serializable
+object WatchList
+
+@Serializable
 data class BusquedaNombre(val pelicula: String)
 
 @Serializable

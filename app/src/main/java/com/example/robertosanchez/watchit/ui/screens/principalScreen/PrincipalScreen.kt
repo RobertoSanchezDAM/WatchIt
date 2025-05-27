@@ -40,6 +40,7 @@ import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.BusquedaScreen
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PerfilScreen
+import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListScreen
 import com.example.robertosanchez.watchit.ui.shapes.BottomBarCustomShape
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 
@@ -136,7 +137,11 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     )
                 }
                 composable(BottomNavItem.Watch.route) {
-                    /*WatchlistContent()*/
+                    WatchListScreen(
+                        auth = auth,
+                        firestore = firestore,
+                        navigateToDetail = navigateToDetail
+                    )
                 }
                 composable(BottomNavItem.Profile.route) {
                     PerfilScreen(auth, firestore, navigateToDetail)

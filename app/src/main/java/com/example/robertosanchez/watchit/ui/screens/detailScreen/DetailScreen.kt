@@ -14,6 +14,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -52,6 +54,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModel
 import kotlinx.coroutines.launch
 
 
@@ -63,18 +66,28 @@ fun DetailScreen(
     popularesViewModel: PeliculasPopularesViewModel,
     ratedViewModel: PeliculasRatedViewModel,
     peliculasFavoritasViewModel: PeliculasFavoritasViewModel,
+    watchListViewModel: WatchListViewModel,
     navigateBack: () -> Unit,
     auth: AuthManager,
 ) {
     val user = auth.getCurrentUser()
     val scope = rememberCoroutineScope()
-    val isFavorite = peliculasFavoritasViewModel.isFavorite(id)
+
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val isFavorite = peliculasFavoritasViewModel.isFavorite(id)
     var localFavoriteState by remember { mutableStateOf(isFavorite) }
+
+    val isAddWatchList = watchListViewModel.isWatched(id)
+    var localWatchListState by remember { mutableStateOf(isAddWatchList) }
+
+    val context = LocalContext.current
 
     LaunchedEffect(isFavorite) {
         localFavoriteState = isFavorite
+    }
+
+    LaunchedEffect(isAddWatchList) {
+        localWatchListState = isAddWatchList
     }
 
     val listaPopulares by popularesViewModel.lista.observeAsState(emptyList())
@@ -281,53 +294,89 @@ fun DetailScreen(
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            IconButton(onClick = {
-                                if (pelicula != null) {
-                                    if (localFavoriteState) {
-                                        localFavoriteState = false
-                                        peliculasFavoritasViewModel.removeFavoriteMovie(
-                                            Pelicula(
-                                                peliculaId = pelicula.id,
-                                                poster = pelicula.poster
+                            Row (
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                IconButton(onClick = {
+                                    if (pelicula != null) {
+                                        if (localFavoriteState) {
+                                            localFavoriteState = false
+                                            peliculasFavoritasViewModel.removeFavoriteMovie(
+                                                Pelicula(
+                                                    peliculaId = pelicula.id,
+                                                    poster = pelicula.poster
+                                                )
                                             )
-                                        )
-                                        Toast.makeText(context, "Película eliminada de favoritos", Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        if (peliculasFavoritasViewModel.canAddMoreFavorites()) {
-                                            localFavoriteState = true
-                                            val success = peliculasFavoritasViewModel.addFavoriteMovie(
+                                            Toast.makeText(context, "Película eliminada de favoritos", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            if (peliculasFavoritasViewModel.canAddMoreFavorites()) {
+                                                localFavoriteState = true
+                                                val success = peliculasFavoritasViewModel.addFavoriteMovie(
+                                                    Pelicula(
+                                                        peliculaId = pelicula.id,
+                                                        poster = pelicula.poster
+                                                    )
+                                                )
+                                                if (success) {
+                                                    Toast.makeText(context, "Película añadida a favoritos", Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    localFavoriteState = false
+                                                    scope.launch {
+                                                        snackbarHostState.showSnackbar(
+                                                            message = "No se pudo añadir la película a favoritos",
+                                                            duration = SnackbarDuration.Short
+                                                        )
+                                                    }
+                                                }
+                                            } else {
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar(
+                                                        message = "No puedes añadir más de 4 películas favoritas",
+                                                        duration = SnackbarDuration.Short
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = if (localFavoriteState) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                        contentDescription = if (localFavoriteState) "Eliminar de favoritos" else "Añadir a favoritos",
+                                        tint = if (localFavoriteState) Color.Red else Color.Gray
+                                    )
+                                }
+
+                                IconButton(onClick = {
+                                    if (pelicula != null) {
+                                        if (localWatchListState) {
+                                            localWatchListState = false
+                                            watchListViewModel.removeWatchList(
+                                                Pelicula(
+                                                    peliculaId = pelicula.id,
+                                                    poster = pelicula.poster
+                                                )
+                                            )
+                                            Toast.makeText(context, "Película para ver eliminada", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            val success = watchListViewModel.addWatchList(
                                                 Pelicula(
                                                     peliculaId = pelicula.id,
                                                     poster = pelicula.poster
                                                 )
                                             )
                                             if (success) {
-                                                Toast.makeText(context, "Película añadida a favoritos", Toast.LENGTH_SHORT).show()
-                                            } else {
-                                                localFavoriteState = false
-                                                scope.launch {
-                                                    snackbarHostState.showSnackbar(
-                                                        message = "No se pudo añadir la película a favoritos",
-                                                        duration = SnackbarDuration.Short
-                                                    )
-                                                }
-                                            }
-                                        } else {
-                                            scope.launch {
-                                                snackbarHostState.showSnackbar(
-                                                    message = "No puedes añadir más de 4 películas favoritas",
-                                                    duration = SnackbarDuration.Short
-                                                )
+                                                Toast.makeText(context, "Película para ver añadida", Toast.LENGTH_SHORT).show()
+                                                localWatchListState = true
                                             }
                                         }
                                     }
+                                }) {
+                                    Icon(
+                                        imageVector = if (localWatchListState) Icons.Filled.Star else Icons.Outlined.Star,
+                                        contentDescription = if (localWatchListState) "Eliminar de la lista para Ver" else "Añadir a la lista para Ver",
+                                        tint = if (localWatchListState) Color.Yellow else Color.Gray
+                                    )
                                 }
-                            }) {
-                                Icon(
-                                    imageVector = if (localFavoriteState) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                                    contentDescription = if (localFavoriteState) "Eliminar de favoritos" else "Añadir a favoritos",
-                                    tint = if (localFavoriteState) Color.Red else Color.Gray
-                                )
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))

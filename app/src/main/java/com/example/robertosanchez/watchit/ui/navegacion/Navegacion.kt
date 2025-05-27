@@ -40,6 +40,9 @@ import com.example.robertosanchez.watchit.ui.screens.registroScreen.RegistroScre
 import com.example.robertosanchez.watchit.ui.screens.listaLargaPeliculas.ListaLargaPeliculasScreen
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModelFactory
+import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListScreen
+import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModel
+import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModelFactory
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -55,6 +58,9 @@ fun Navegacion(auth: AuthManager) {
     val firestoreManager = FirestoreManager(auth, context)
     val peliculasFavoritasViewModel: PeliculasFavoritasViewModel = viewModel(
         factory = PeliculasFavoritasViewModelFactory(firestoreManager, auth)
+    )
+    val watchListViewModel: WatchListViewModel = viewModel(
+        factory = WatchListViewModelFactory(firestoreManager, auth)
     )
 
     NavHost(navController = navController, startDestination = Inicio) {
@@ -152,6 +158,7 @@ fun Navegacion(auth: AuthManager) {
                 peliculasFavoritasViewModel = peliculasFavoritasViewModel,
                 navigateBack = { navController.popBackStack() },
                 auth = auth,
+                watchListViewModel = watchListViewModel
             )
         }
 
@@ -165,6 +172,16 @@ fun Navegacion(auth: AuthManager) {
                 navigateToListaGenero = { navController.navigate(ListaGenero) },
                 navigateToProximosEstrenos = { navController.navigate(ProximosEstrenos) },
                 navigateToEnCines = {navController.navigate(EnCines)}
+            )
+        }
+
+        composable<WatchList> {
+            WatchListScreen(
+                auth = auth,
+                firestore = firestoreManager,
+                navigateToDetail = { id ->
+                    navController.navigate(Detail(id))
+                }
             )
         }
 
