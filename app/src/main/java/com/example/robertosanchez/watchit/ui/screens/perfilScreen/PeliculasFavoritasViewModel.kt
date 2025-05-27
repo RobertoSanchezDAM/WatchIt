@@ -24,7 +24,7 @@ class PeliculasFavoritasViewModel(
         loadFavorites()
     }
 
-    private fun loadFavorites() {
+    fun loadFavorites() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val currentUserId = authManager.getCurrentUser()?.uid

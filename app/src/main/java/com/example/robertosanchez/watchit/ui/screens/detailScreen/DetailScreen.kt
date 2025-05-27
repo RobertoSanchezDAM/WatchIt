@@ -82,11 +82,13 @@ fun DetailScreen(
 
     val context = LocalContext.current
 
-    LaunchedEffect(isFavorite) {
-        localFavoriteState = isFavorite
+    LaunchedEffect(user) {
+        peliculasFavoritasViewModel.loadFavorites()
+        watchListViewModel.loadWatchList()
     }
 
-    LaunchedEffect(isAddWatchList) {
+    LaunchedEffect(user, isFavorite, isAddWatchList) {
+        localFavoriteState = isFavorite
         localWatchListState = isAddWatchList
     }
 

@@ -23,7 +23,7 @@ class WatchListViewModel(
         loadWatchList()
     }
 
-    private fun loadWatchList() {
+    fun loadWatchList() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val currentUserId = authManager.getCurrentUser()?.uid
