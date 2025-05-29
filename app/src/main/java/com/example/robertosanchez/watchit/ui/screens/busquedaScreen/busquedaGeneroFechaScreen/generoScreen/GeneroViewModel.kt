@@ -16,6 +16,8 @@ class GeneroViewModel(private var genero: Int) : ViewModel() {
     private val _progressBar: MutableLiveData<Boolean> = MutableLiveData(false)
     val progressBar: LiveData<Boolean> = _progressBar
 
+    val generoSeleccionado: Int = genero
+
     init {
         if (genero != 0) {
             buscarGenero(genero)

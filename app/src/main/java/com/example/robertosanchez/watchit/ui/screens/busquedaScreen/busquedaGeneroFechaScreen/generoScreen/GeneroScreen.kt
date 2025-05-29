@@ -53,7 +53,7 @@ fun GeneroScreen(
     val lista_buscada by viewModel.lista.observeAsState(emptyList())
     val progressBar_buscada by viewModel.progressBar.observeAsState(false)
 
-    val generoBuscado = lista_buscada.firstOrNull()?.genre_ids?.firstOrNull()
+    val generoBuscado = viewModel.generoSeleccionado
     val nombreGenero = when(generoBuscado) {
         28 -> "Acción"
         12 -> "Aventura"
@@ -99,14 +99,12 @@ fun GeneroScreen(
                             )
                         }
 
-                        if (!progressBar_buscada) {
-                            Text(
-                                text = "Películas de $nombreGenero",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color.Black.copy(alpha = 0.8f)
-                            )
-                        }
+                        Text(
+                            text = "Películas de $nombreGenero",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.Black.copy(alpha = 0.8f)
+                        )
 
                         if (user?.photoUrl != null) {
                             AsyncImage(
