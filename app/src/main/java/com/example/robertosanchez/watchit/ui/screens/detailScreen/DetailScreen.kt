@@ -54,7 +54,7 @@ import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListVi
 import kotlinx.coroutines.launch
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
