@@ -296,7 +296,7 @@ fun SeccionPeliculas(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(lista_populares!!.take(10)) { pelicula -> // <--- Limitamos a 10
+                        items(lista_populares!!.take(10)) { pelicula ->
                             PeliculasListItem(pelicula, navigateToDetail)
                         }
                         item {
@@ -354,7 +354,7 @@ fun SeccionPeliculas(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(lista_rated!!.take(10)) { pelicula -> // <--- Limitamos a 10
+                        items(lista_rated!!.take(10)) { pelicula ->
                             PeliculasListItem(pelicula, navigateToDetail)
                         }
                         item {

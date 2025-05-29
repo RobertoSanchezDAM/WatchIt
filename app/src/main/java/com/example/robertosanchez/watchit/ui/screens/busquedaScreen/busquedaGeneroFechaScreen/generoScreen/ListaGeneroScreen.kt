@@ -63,7 +63,7 @@ fun ListaGeneroScreen(
                         }
 
                         Text(
-                            text = "Año de Lanzamiento",
+                            text = "Lista de Géneros",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.Black.copy(alpha = 0.8f)

@@ -1,7 +1,6 @@
 package com.example.robertosanchez.watchit.ui.screens.watchListScreen
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.db.FirestoreManager

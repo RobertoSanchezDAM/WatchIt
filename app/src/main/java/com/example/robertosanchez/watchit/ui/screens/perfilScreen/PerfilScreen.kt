@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -106,7 +105,6 @@ fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager, navigateToDetai
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Foto de perfil grande
             Box(
                 modifier = Modifier
                     .size(150.dp)
@@ -138,7 +136,6 @@ fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager, navigateToDetai
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Nombre del usuario
             Text(
                 text = if (user == null) "Anónimo" else (user.displayName ?: "Usuario"),
                 fontSize = 24.sp,
@@ -148,7 +145,6 @@ fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager, navigateToDetai
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Email del usuario
             Text(
                 text = if (user == null) "correo anónimo" else (user.email ?: "Email no disponible"),
                 fontSize = 16.sp,

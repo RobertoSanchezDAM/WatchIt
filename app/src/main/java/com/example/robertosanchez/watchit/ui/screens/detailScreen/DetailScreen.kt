@@ -34,7 +34,6 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
-import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.Alignment

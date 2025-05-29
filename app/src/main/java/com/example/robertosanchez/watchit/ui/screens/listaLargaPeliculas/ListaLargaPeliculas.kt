@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,7 +27,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -38,9 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
@@ -49,10 +44,6 @@ import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.data.model.MediaItem
-import com.example.robertosanchez.watchit.ui.navegacion.BottomNavItem
-import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
-import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PerfilScreen
-import com.example.robertosanchez.watchit.ui.screens.principalScreen.DialogType
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasPopularesViewModel
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasRatedViewModel
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
@@ -63,16 +54,12 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 fun ListaLargaPeliculasScreen(
     popularesViewModel: PeliculasPopularesViewModel,
     ratedViewModel: PeliculasRatedViewModel,
-    favoritasViewModel: PeliculasFavoritasViewModel,
     seccion: String,
     navigateToDetail: (Int) -> Unit,
     auth: AuthManager,
     navigateBack: () -> Unit,
-    navigateToLogin: () -> Unit,
 ) {
     val user = auth.getCurrentUser()
-    var showDialog by remember { mutableStateOf<DialogType?>(null) }
-    val navController = rememberNavController()
 
     val lista_populares by popularesViewModel.lista.observeAsState(emptyList())
     val progressBar_populares by popularesViewModel.progressBar.observeAsState(false)

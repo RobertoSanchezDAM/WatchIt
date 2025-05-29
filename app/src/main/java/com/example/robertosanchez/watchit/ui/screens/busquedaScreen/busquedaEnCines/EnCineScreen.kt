@@ -56,8 +56,6 @@ fun EnCineScreen(
     val lista_buscada by viewModel.lista.observeAsState(emptyList())
     val progressBar_buscada by viewModel.progressBar.observeAsState(false)
 
-    val añoActual = lista_buscada.firstOrNull()?.release_date?.take(4) ?: ""
-
     Scaffold(
         topBar = {
             TopAppBar(
