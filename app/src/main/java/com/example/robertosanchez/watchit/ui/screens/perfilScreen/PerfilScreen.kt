@@ -1,6 +1,7 @@
 package com.example.robertosanchez.watchit.ui.screens.perfilScreen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,6 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -137,7 +139,7 @@ fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager, navigateToDetai
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = if (user == null) "Anónimo" else (user.displayName ?: "Usuario"),
+                text = if (user?.isAnonymous == true) "Anónimo" else (user?.displayName ?: "Usuario"),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -146,49 +148,65 @@ fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager, navigateToDetai
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = if (user == null) "correo anónimo" else (user.email ?: "Email no disponible"),
+                text = if (user?.isAnonymous == true) "correo anónimo" else (user?.email ?: "Email no disponible"),
                 fontSize = 16.sp,
                 color = Color.White.copy(alpha = 0.8f)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                items(4) { index ->
-                    if (index < peliculasFavoritas.size) {
-                        val pelicula = peliculasFavoritas[index]
-                        Box(
-                            modifier = Modifier
-                                .size(width = 80.dp, height = 120.dp)
-                                .clickable { navigateToDetail(pelicula.peliculaId) }
-                                .border(
-                                    width = 1.dp,
-                                    color = Color.Gray.copy(alpha = 0.7f)
-                                )
-                        ) {
-                            pelicula.poster?.let { posterUrl ->
-                                AsyncImage(
-                                    model = "https://image.tmdb.org/t/p/w185$posterUrl",
-                                    contentDescription = "Poster de película",
-                                    modifier = Modifier.fillMaxSize()
-                                )
+            if (user?.isAnonymous == true) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Debes iniciar sesión para ver tus películas favoritas.",
+                        fontSize = 18.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(4) { index ->
+                        if (index < peliculasFavoritas.size) {
+                            val pelicula = peliculasFavoritas[index]
+                            Box(
+                                modifier = Modifier
+                                    .size(width = 80.dp, height = 120.dp)
+                                    .clickable { navigateToDetail(pelicula.peliculaId) }
+                                    .border(
+                                        width = 1.dp,
+                                        color = Color.Gray.copy(alpha = 0.7f)
+                                    )
+                            ) {
+                                pelicula.poster?.let { posterUrl ->
+                                    AsyncImage(
+                                        model = "https://image.tmdb.org/t/p/w185$posterUrl",
+                                        contentDescription = "Poster de película",
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
                             }
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .size(width = 80.dp, height = 120.dp)
-                                .background(Color.Gray.copy(alpha = 0.3f))
-                                .border(
-                                    width = 1.dp,
-                                    color = Color.Gray.copy(alpha = 0.7f)
-                                )
-                        ) {
-                            // Vacio
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .size(width = 80.dp, height = 120.dp)
+                                    .background(Color.Gray.copy(alpha = 0.3f))
+                                    .border(
+                                        width = 1.dp,
+                                        color = Color.Gray.copy(alpha = 0.7f)
+                                    )
+                            ) {
+                                // Vacio
+                            }
                         }
                     }
                 }

@@ -127,14 +127,12 @@ fun Navegacion(auth: AuthManager) {
             ListaLargaPeliculasScreen(
                 popularesViewModel = popularesViewModel,
                 ratedViewModel = ratedViewModel,
-                favoritasViewModel = peliculasFavoritasViewModel,
                 seccion = seccion.tipo,
                 navigateToDetail = { id ->
                     navController.navigate(Detail(id))
                 },
                 auth = auth,
                 navigateBack = { navController.popBackStack() },
-                navigateToLogin = { navController.navigate(Login) },
             )
         }
 

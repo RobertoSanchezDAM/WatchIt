@@ -294,7 +294,14 @@ fun DetailScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 IconButton(onClick = {
-                                    if (pelicula != null) {
+                                    if (user?.isAnonymous == true) {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = "Debes iniciar sesión para añadir a favoritos",
+                                                duration = SnackbarDuration.Short
+                                            )
+                                        }
+                                    } else if (pelicula != null) {
                                         if (localFavoriteState) {
                                             localFavoriteState = false
                                             peliculasFavoritasViewModel.removeFavoriteMovie(
@@ -338,12 +345,19 @@ fun DetailScreen(
                                     Icon(
                                         imageVector = if (localFavoriteState) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                                         contentDescription = if (localFavoriteState) "Eliminar de favoritos" else "Añadir a favoritos",
-                                        tint = if (localFavoriteState) Color.Red else Color.Gray
+                                        tint = if (user == null) Color.Gray else if (localFavoriteState) Color.Red else Color.Gray
                                     )
                                 }
 
                                 IconButton(onClick = {
-                                    if (pelicula != null) {
+                                    if (user?.isAnonymous == true) {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = "Debes iniciar sesión para añadir a tu lista",
+                                                duration = SnackbarDuration.Short
+                                            )
+                                        }
+                                    } else if (pelicula != null) {
                                         if (localWatchListState) {
                                             localWatchListState = false
                                             watchListViewModel.removeWatchList(
@@ -370,7 +384,7 @@ fun DetailScreen(
                                     Icon(
                                         imageVector = if (localWatchListState) Icons.Filled.Star else Icons.Outlined.Star,
                                         contentDescription = if (localWatchListState) "Eliminar de la lista para Ver" else "Añadir a la lista para Ver",
-                                        tint = if (localWatchListState) Color.Yellow else Color.Gray
+                                        tint = if (user == null) Color.Gray else if (localWatchListState) Color.Yellow else Color.Gray
                                     )
                                 }
                             }
