@@ -3,8 +3,10 @@ package com.example.robertosanchez.watchit.repositories
 import com.example.robertosanchez.watchit.repositories.models.CreditsResponse
 import com.example.robertosanchez.watchit.repositories.models.MovieImagesResponse
 import com.example.robertosanchez.watchit.repositories.models.RemoteResult
+import com.example.robertosanchez.watchit.repositories.models.MovieDetail
 import retrofit2.http.GET
 import retrofit2.http.Query
+import retrofit2.http.Path
 
 interface RemoteService {
     @GET("discover/movie?language=es-ES&sort_by=popularity.desc")
@@ -21,13 +23,13 @@ interface RemoteService {
 
     @GET("movie/{movie_id}/credits")
     suspend fun getMovieCredits(
-        @retrofit2.http.Path("movie_id") movieId: Int,
+        @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String
     ): CreditsResponse
 
     @GET("movie/{movie_id}/images")
     suspend fun getImages(
-        @retrofit2.http.Path("movie_id") movieId: Int,
+        @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String
     ): MovieImagesResponse
 
@@ -75,4 +77,11 @@ interface RemoteService {
         @Query("region") region: String = "ES",
         @Query("page") page: Int = 1
     ): RemoteResult
+
+    @GET("movie/{movie_id}")
+    suspend fun peliculaDetalle(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = "es-ES"
+    ): MovieDetail
 }

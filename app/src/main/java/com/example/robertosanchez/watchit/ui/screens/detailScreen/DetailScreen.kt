@@ -1,6 +1,7 @@
 package com.example.robertosanchez.watchit.ui.screens.detailScreen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -95,6 +96,9 @@ fun DetailScreen(
     val listaEnCine by enCineViewModel.lista.observeAsState(emptyList())
     val listaProximosEstrenos by proximosEstrenosViewModel.lista.observeAsState(emptyList())
 
+    val detailGeneroViewModel: DetailGeneroViewModel = viewModel()
+    val listaGenero by detailGeneroViewModel.lista.observeAsState(emptyList())
+
     val creditsViewModel: DetailCreditsViewModel = viewModel()
     val credits by creditsViewModel.credits.observeAsState()
 
@@ -128,11 +132,23 @@ fun DetailScreen(
         imagesViewModel.fetchImages(id)
     }
 
-    val pelicula = remember(id) {
+    // Efecto separado para buscar la película por ID si no está en las listas
+    LaunchedEffect(listaPopulares, listaRated, listaEnCine, listaProximosEstrenos) {
+        if (listaPopulares.find { it.id == id } == null &&
+            listaRated.find { it.id == id } == null &&
+            listaEnCine.find { it.id == id } == null &&
+            listaProximosEstrenos.find { it.id == id } == null &&
+            listaGenero.find { it.id == id } == null) {
+            detailGeneroViewModel.buscarPeliculaPorId(id)
+        }
+    }
+
+    val pelicula = remember(id, listaPopulares, listaRated, listaEnCine, listaProximosEstrenos, listaGenero) {
         listaPopulares.find { it.id == id } ?:
         listaRated.find { it.id == id } ?:
         listaEnCine.find { it.id == id } ?:
-        listaProximosEstrenos.find { it.id == id }
+        listaProximosEstrenos.find { it.id == id } ?:
+        listaGenero.find { it.id == id }
     }
 
     val generosId = pelicula?.genre_ids ?: emptyList()
@@ -250,9 +266,8 @@ fun DetailScreen(
                                 .padding(16.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                val posterPath = images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path ?: pelicula.poster
                                 Image(
-                                    painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original$posterPath"),
+                                    painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original${pelicula.poster}"),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .width(110.dp)
