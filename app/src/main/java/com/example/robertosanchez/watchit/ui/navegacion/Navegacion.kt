@@ -154,6 +154,8 @@ fun Navegacion(auth: AuthManager) {
                 popularesViewModel = popularesViewModel,
                 ratedViewModel = ratedViewModel,
                 peliculasFavoritasViewModel = peliculasFavoritasViewModel,
+                enCineViewModel = enCineViewModel,
+                proximosEstrenosViewModel = proximosEstrenosViewModel,
                 navigateBack = { navController.popBackStack() },
                 auth = auth,
                 watchListViewModel = watchListViewModel

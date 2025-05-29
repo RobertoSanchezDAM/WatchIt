@@ -48,6 +48,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaEnCines.EnCineViewModel
+import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaProximosEstrenos.ProximosEstrenosViewModel
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModel
 import kotlinx.coroutines.launch
 
@@ -60,6 +62,8 @@ fun DetailScreen(
     popularesViewModel: PeliculasPopularesViewModel,
     ratedViewModel: PeliculasRatedViewModel,
     peliculasFavoritasViewModel: PeliculasFavoritasViewModel,
+    enCineViewModel: EnCineViewModel,
+    proximosEstrenosViewModel: ProximosEstrenosViewModel,
     watchListViewModel: WatchListViewModel,
     navigateBack: () -> Unit,
     auth: AuthManager,
@@ -88,6 +92,8 @@ fun DetailScreen(
 
     val listaPopulares by popularesViewModel.lista.observeAsState(emptyList())
     val listaRated by ratedViewModel.lista.observeAsState(emptyList())
+    val listaEnCine by enCineViewModel.lista.observeAsState(emptyList())
+    val listaProximosEstrenos by proximosEstrenosViewModel.lista.observeAsState(emptyList())
 
     val creditsViewModel: DetailCreditsViewModel = viewModel()
     val credits by creditsViewModel.credits.observeAsState()
@@ -123,7 +129,10 @@ fun DetailScreen(
     }
 
     val pelicula = remember(id) {
-        listaPopulares.find { it.id == id } ?: listaRated.find { it.id == id }
+        listaPopulares.find { it.id == id } ?:
+        listaRated.find { it.id == id } ?:
+        listaEnCine.find { it.id == id } ?:
+        listaProximosEstrenos.find { it.id == id }
     }
 
     val generosId = pelicula?.genre_ids ?: emptyList()
