@@ -105,6 +105,35 @@ class PeliculasVistasViewModel (
     fun isVista(movieId: Int): Boolean {
         return _uiState.value.peliculas.any { it.peliculaId == movieId }
     }
+
+    fun getRating(movieId: Int): Int {
+        return _uiState.value.peliculas.find { it.peliculaId == movieId }?.estrellas ?: 0
+    }
+
+    fun updateRating(movieId: Int, rating: Int) {
+        val currentUserId = authManager.getCurrentUser()?.uid
+
+        if (currentUserId != null) {
+            viewModelScope.launch {
+                try {
+                    firestore.updateVistaRating(currentUserId, movieId, rating)
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            peliculas = currentState.peliculas.map { pelicula ->
+                                if (pelicula.peliculaId == movieId) {
+                                    pelicula.copy(estrellas = rating)
+                                } else {
+                                    pelicula
+                                }
+                            }
+                        )
+                    }
+                } catch (e: Exception) {
+                    // Manejar el error si es necesario
+                }
+            }
+        }
+    }
 }
 
 data class UiState(

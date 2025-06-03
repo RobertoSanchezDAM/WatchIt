@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -41,7 +44,6 @@ import coil.request.ImageRequest
 import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.db.FirestoreManager
-import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
 import com.example.robertosanchez.watchit.db.PeliculasVistas.PeliculasVistas
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 
@@ -76,7 +78,7 @@ fun PeliculasVistasScreen (
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Películas para Ver",
+                            text = "Películas Vistas",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.Black.copy(alpha = 0.8f),
@@ -150,6 +152,7 @@ fun PeliculasVistasScreen (
                             pelicula,
                             navigateToDetail
                         )
+
                     }
                 }
             }
@@ -160,18 +163,39 @@ fun PeliculasVistasScreen (
 
 @Composable
 private fun PeliculaItem(pelicula: PeliculasVistas, navigateToDetail: (Int) -> Unit) {
-    Box(
+    Column(
         modifier = Modifier
             .width(140.dp)
-            .height(180.dp)
             .clickable { navigateToDetail(pelicula.peliculaId) }
-            .border(
-                width = 0.5.dp,
-                color = Color.Gray.copy(alpha = 0.7f)
-            )
     ) {
-        Imagen(item = pelicula)
-        Text("${pelicula.estrellas}")
+        Box(
+            modifier = Modifier
+                .height(180.dp)
+                .border(
+                    width = 0.5.dp,
+                    color = Color.Gray.copy(alpha = 0.7f)
+                )
+        ) {
+            Imagen(item = pelicula)
+        }
+        
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            repeat(5) { index ->
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = "Estrella",
+                    tint = if (index < (pelicula.estrellas ?: 0)) Color(0xFFFFD700) else Color.Gray,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .alpha(if (index < (pelicula.estrellas ?: 0)) 1f else 0.3f)
+                )
+            }
+        }
     }
 }
 

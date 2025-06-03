@@ -71,5 +71,14 @@ class FirestoreManager(auth: AuthManager, context: Context) {
                 querySnapshot.documents.mapNotNull { it.toObject(PeliculasVistas::class.java) }
             }
     }
+
+    suspend fun updateVistaRating(userId: String, movieId: Int, rating: Int) {
+        firestore.collection("usuarios")
+            .document(userId)
+            .collection("peliculas_vistas")
+            .document(movieId.toString())
+            .update("estrellas", rating)
+            .await()
+    }
 }
 

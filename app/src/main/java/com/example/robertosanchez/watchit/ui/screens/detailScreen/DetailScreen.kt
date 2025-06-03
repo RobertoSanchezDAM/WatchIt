@@ -2,6 +2,7 @@ package com.example.robertosanchez.watchit.ui.screens.detailScreen
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -54,6 +55,8 @@ import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaProx
 import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.PeliculasVistasViewModel
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Path
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "NewApi")
@@ -86,6 +89,7 @@ fun DetailScreen(
 
     val context = LocalContext.current
 
+    var showRatingDialog by remember { mutableStateOf(false) }
     LaunchedEffect(user) {
         peliculasFavoritasViewModel.loadFavorites()
         watchListViewModel.loadWatchList()
@@ -453,13 +457,62 @@ fun DetailScreen(
                                 }) {
                                     Icon(
                                         painter = painterResource(R.drawable.eye),
-                                        contentDescription = if (isVista) "Marcada como vista" else "Marcar como vista",
-                                        tint = if (user == null) Color.Gray else if (isVista) Color.Green else Color.Gray
+                                        contentDescription = if (localVistaState) "Marcada como vista" else "Marcar como vista",
+                                        tint = if (user == null) Color.Gray else if (localVistaState) Color.Cyan else Color.Gray
                                     )
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            if (localVistaState) {
+                                var localValoracion by remember { mutableStateOf(peliculasVistasViewModel.getRating(id)) }
+                                
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                color = Color(0xFF2A2A2A),
+                                                shape = RoundedCornerShape(8.dp)
+                                            )
+                                            .padding(16.dp)
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Tu valoración:",
+                                                color = Color.White,
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.padding(bottom = 8.dp),
+                                                textAlign = TextAlign.Center
+                                            )
+                                            Estrellas(
+                                                valoracion = localValoracion,
+                                                onValoracionSelected = { valoracion ->
+                                                    localValoracion = valoracion
+                                                    scope.launch {
+                                                        if (user != null) {
+                                                            peliculasVistasViewModel.updateRating(id, valoracion)
+                                                            snackbarHostState.showSnackbar("Valoración guardada")
+                                                        }
+                                                    }
+                                                },
+                                                modifier = Modifier.fillMaxWidth()
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(6.dp))
 
                             var expandir by remember { mutableStateOf(false) }
 
@@ -576,6 +629,38 @@ fun DetailScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Estrellas(
+    valoracion: Int,
+    onValoracionSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(5) { index ->
+            IconButton(
+                onClick = { 
+                    val nuevaValoracion = if (index + 1 == valoracion) 0 else (index + 1)
+                    onValoracionSelected(nuevaValoracion)
+                },
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = "Estrella ${index + 1}",
+                    tint = if (index < valoracion) Color(0xFFFFD700) else Color.Gray,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .alpha(if (index < valoracion) 1f else 0.3f)
+                )
             }
         }
     }
