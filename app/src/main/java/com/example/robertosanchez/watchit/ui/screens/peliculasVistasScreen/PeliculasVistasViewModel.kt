@@ -1,17 +1,18 @@
-package com.example.robertosanchez.watchit.ui.screens.watchListScreen
+package com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.db.FirestoreManager
 import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
+import com.example.robertosanchez.watchit.db.PeliculasVistas.PeliculasVistas
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class WatchListViewModel(
+class PeliculasVistasViewModel (
     private val firestore: FirestoreManager,
     private val authManager: AuthManager
 ) : ViewModel() {
@@ -19,17 +20,17 @@ class WatchListViewModel(
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     init {
-        loadWatchList()
+        loadVistas()
     }
 
-    fun loadWatchList() {
+    fun loadVistas() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val currentUserId = authManager.getCurrentUser()?.uid
 
             if (currentUserId != null) {
                 try {
-                    firestore.getWacthList(currentUserId).collect { peliculas ->
+                    firestore.getVistas(currentUserId).collect { peliculas ->
                         _uiState.update { uiState ->
                             uiState.copy(
                                 peliculas = peliculas.take(4),
@@ -46,7 +47,7 @@ class WatchListViewModel(
         }
     }
 
-    fun addWatchList(movie: Pelicula): Boolean {
+    fun addVista(movie: PeliculasVistas): Boolean {
         val currentUserId = authManager.getCurrentUser()?.uid
 
         if (currentUserId == null) {
@@ -65,7 +66,7 @@ class WatchListViewModel(
 
         viewModelScope.launch {
             try {
-                firestore.addWatchList(currentUserId, movie)
+                firestore.addVistas(currentUserId, movie)
             } catch (e: Exception) {
                 _uiState.update { currentState ->
                     currentState.copy(
@@ -77,7 +78,7 @@ class WatchListViewModel(
         return true
     }
 
-    fun removeWatchList(movie: Pelicula) {
+    fun removeVista(movie: PeliculasVistas) {
         val currentUserId = authManager.getCurrentUser()?.uid
 
         if (currentUserId != null) {
@@ -89,7 +90,7 @@ class WatchListViewModel(
 
             viewModelScope.launch {
                 try {
-                    firestore.removeWatchList(currentUserId, movie)
+                    firestore.removeVistas(currentUserId, movie)
                 } catch (e: Exception) {
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -101,14 +102,14 @@ class WatchListViewModel(
         }
     }
 
-    fun isWatchList(movieId: Int): Boolean {
+    fun isVista(movieId: Int): Boolean {
         return _uiState.value.peliculas.any { it.peliculaId == movieId }
     }
 }
 
 data class UiState(
     val isLoading: Boolean = true,
-    val peliculas: List<Pelicula> = emptyList(),
+    val peliculas: List<PeliculasVistas> = emptyList(),
     val showAddNoteDialog: Boolean = false,
     val showLogoutDialog: Boolean = false
 )

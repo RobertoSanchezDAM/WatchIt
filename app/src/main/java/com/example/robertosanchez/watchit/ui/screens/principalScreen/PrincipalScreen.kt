@@ -57,7 +57,8 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     navigateToListaFecha: () -> Unit,
                     navigateToListaGenero: () -> Unit,
                     navigateToProximosEstrenos: () -> Unit,
-                    navigateToEnCine: () -> Unit
+                    navigateToEnCine: () -> Unit,
+                    navigateToVistas: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf<DialogType?>(null) }
     val navController = rememberNavController()
@@ -143,7 +144,7 @@ fun PrincipalScreen(popularesViewModel: PeliculasPopularesViewModel,
                     )
                 }
                 composable(BottomNavItem.Profile.route) {
-                    PerfilScreen(auth, firestore, navigateToDetail)
+                    PerfilScreen(auth, firestore, navigateToDetail, navigateToVistas)
                 }
             }
         }

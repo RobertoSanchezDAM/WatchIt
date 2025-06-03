@@ -24,6 +24,9 @@ data class ListaLargaPeliculas(val tipo: String = "")
 object Perfil
 
 @Serializable
+object PeliculasVistas
+
+@Serializable
 data class Detail(val id: Int)
 
 @Serializable

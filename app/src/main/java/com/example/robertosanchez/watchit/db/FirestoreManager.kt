@@ -3,6 +3,7 @@ package com.example.robertosanchez.watchit.db
 import android.content.Context
 import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
+import com.example.robertosanchez.watchit.db.PeliculasVistas.PeliculasVistas
 import com.example.robertosanchez.watchit.db.Usuario.UsuarioDB
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
@@ -51,6 +52,23 @@ class FirestoreManager(auth: AuthManager, context: Context) {
             .snapshots()
             .map { querySnapshot ->
                 querySnapshot.documents.mapNotNull { it.toObject(Pelicula::class.java) }
+            }
+    }
+
+    // Peliculas Vistas (Subcoleccion "peliculas_vistas")
+    suspend fun addVistas(userId: String, movie: PeliculasVistas) {
+        firestore.collection("usuarios").document(userId).collection("peliculas_vistas").document(movie.peliculaId.toString()).set(movie).await()
+    }
+
+    suspend fun removeVistas(userId: String, movie: PeliculasVistas) {
+        firestore.collection("usuarios").document(userId).collection("peliculas_vistas").document(movie.peliculaId.toString()).delete().await()
+    }
+
+    fun getVistas(userId: String): Flow<List<PeliculasVistas>> {
+        return firestore.collection("usuarios").document(userId).collection("peliculas_vistas")
+            .snapshots()
+            .map { querySnapshot ->
+                querySnapshot.documents.mapNotNull { it.toObject(PeliculasVistas::class.java) }
             }
     }
 }

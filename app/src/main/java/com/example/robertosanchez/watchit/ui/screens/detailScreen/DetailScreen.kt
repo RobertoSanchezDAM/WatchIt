@@ -1,7 +1,6 @@
 package com.example.robertosanchez.watchit.ui.screens.detailScreen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -49,8 +48,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import com.example.robertosanchez.watchit.db.PeliculasVistas.PeliculasVistas
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaEnCines.EnCineViewModel
 import com.example.robertosanchez.watchit.ui.screens.busquedaScreen.busquedaProximosEstrenos.ProximosEstrenosViewModel
+import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.PeliculasVistasViewModel
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModel
 import kotlinx.coroutines.launch
 
@@ -66,6 +67,7 @@ fun DetailScreen(
     enCineViewModel: EnCineViewModel,
     proximosEstrenosViewModel: ProximosEstrenosViewModel,
     watchListViewModel: WatchListViewModel,
+    peliculasVistasViewModel: PeliculasVistasViewModel,
     navigateBack: () -> Unit,
     auth: AuthManager,
 ) {
@@ -76,19 +78,24 @@ fun DetailScreen(
     val isFavorite = peliculasFavoritasViewModel.isFavorite(id)
     var localFavoriteState by remember { mutableStateOf(isFavorite) }
 
-    val isAddWatchList = watchListViewModel.isWatched(id)
+    val isAddWatchList = watchListViewModel.isWatchList(id)
     var localWatchListState by remember { mutableStateOf(isAddWatchList) }
+
+    val isVista = peliculasVistasViewModel.isVista(id)
+    var localVistaState by remember { mutableStateOf(isVista) }
 
     val context = LocalContext.current
 
     LaunchedEffect(user) {
         peliculasFavoritasViewModel.loadFavorites()
         watchListViewModel.loadWatchList()
+        peliculasVistasViewModel.loadVistas()
     }
 
-    LaunchedEffect(user, isFavorite, isAddWatchList) {
+    LaunchedEffect(user, isFavorite, isAddWatchList, isVista) {
         localFavoriteState = isFavorite
         localWatchListState = isAddWatchList
+        localVistaState = isVista
     }
 
     val listaPopulares by popularesViewModel.lista.observeAsState(emptyList())
@@ -411,11 +418,51 @@ fun DetailScreen(
                                         tint = if (user == null) Color.Gray else if (localWatchListState) Color.Yellow else Color.Gray
                                     )
                                 }
+
+                                IconButton(onClick = {
+                                    if (user?.isAnonymous == true) {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = "Debes iniciar sesión para añadir a tu lista",
+                                                duration = SnackbarDuration.Short
+                                            )
+                                        }
+                                    } else if (pelicula != null) {
+                                        if (localVistaState) {
+                                            localVistaState = false
+                                            peliculasVistasViewModel.removeVista(
+                                                PeliculasVistas(
+                                                    peliculaId = pelicula.id,
+                                                    poster = pelicula.poster
+                                                )
+                                            )
+                                            Toast.makeText(context, "Película vista eliminada", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            val success = peliculasVistasViewModel.addVista(
+                                                PeliculasVistas(
+                                                    peliculaId = pelicula.id,
+                                                    poster = pelicula.poster
+                                                )
+                                            )
+                                            if (success) {
+                                                Toast.makeText(context, "Película vista añadida", Toast.LENGTH_SHORT).show()
+                                                localVistaState = true
+                                            }
+                                        }
+                                    }
+                                }) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.eye),
+                                        contentDescription = if (isVista) "Marcada como vista" else "Marcar como vista",
+                                        tint = if (user == null) Color.Gray else if (isVista) Color.Green else Color.Gray
+                                    )
+                                }
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
 
                             var expandir by remember { mutableStateOf(false) }
+
                             Text(
                                 text = "Sinopsis",
                                 color = Color.White,
@@ -423,14 +470,17 @@ fun DetailScreen(
                                 fontSize = 18.sp,
                                 modifier = Modifier.padding(bottom = 4.dp)
                             )
+
                             val sinopsis = pelicula.sinopsis ?: "Sinopsis no disponible."
                             val maxLineas = if (expandir) Int.MAX_VALUE else 3
+
                             Text(
                                 text = sinopsis,
                                 color = Color.White,
                                 maxLines = maxLineas,
                                 fontSize = 16.sp
                             )
+
                             if (!expandir && sinopsis.length > 120) {
                                 TextButton(
                                     onClick = { expandir = true },
@@ -440,6 +490,7 @@ fun DetailScreen(
                                     Text("Leer más", color = Color.Gray)
                                 }
                             }
+
                             if (expandir && sinopsis.length > 120) {
                                 TextButton(
                                     onClick = { expandir = false },
@@ -452,6 +503,7 @@ fun DetailScreen(
 
                             credits?.cast?.take(10)?.let { castList ->
                                 Spacer(modifier = Modifier.height(16.dp))
+
                                 Text(
                                     text = "Reparto principal",
                                     color = Color.White,

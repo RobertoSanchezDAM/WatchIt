@@ -33,7 +33,12 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager, navigateToDetail: (Int) -> Unit) {
+fun PerfilScreen(
+    auth: AuthManager,
+    firestore: FirestoreManager,
+    navigateToDetail: (Int) -> Unit,
+    navigateToVistas: () -> Unit
+) {
     val user = auth.getCurrentUser()
     var peliculasFavoritas by remember { mutableStateOf<List<Pelicula>>(emptyList()) }
 
@@ -212,6 +217,31 @@ fun PerfilScreen(auth: AuthManager, firestore: FirestoreManager, navigateToDetai
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Texto a la izquierda
+                Text(
+                    text = "Películas Vistas",
+                    fontSize = 16.sp
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Numero",
+                        color = Color.Blue,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .clickable { navigateToVistas() }
+                            .padding(end = 8.dp)
+                    )
+                }
+            }
         }
     }
 }

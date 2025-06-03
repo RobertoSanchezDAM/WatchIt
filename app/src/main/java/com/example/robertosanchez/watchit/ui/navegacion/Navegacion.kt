@@ -38,6 +38,9 @@ import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasPo
 import com.example.robertosanchez.watchit.ui.screens.principalScreen.PeliculasRatedViewModel
 import com.example.robertosanchez.watchit.ui.screens.registroScreen.RegistroScreen
 import com.example.robertosanchez.watchit.ui.screens.listaLargaPeliculas.ListaLargaPeliculasScreen
+import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.PeliculasVistasScreen
+import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.PeliculasVistasViewModel
+import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.PeliculasVistasViewModelFactory
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModelFactory
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListScreen
@@ -50,17 +53,28 @@ import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListVi
 fun Navegacion(auth: AuthManager) {
     val navController = rememberNavController()
     val context = LocalContext.current
+
+    // ViewModels de distintas secciones de películas
     val popularesViewModel = remember { PeliculasPopularesViewModel() }
     val ratedViewModel = remember { PeliculasRatedViewModel() }
     val proximosEstrenosViewModel = remember { ProximosEstrenosViewModel() }
     val enCineViewModel = remember { EnCineViewModel() }
 
     val firestoreManager = FirestoreManager(auth, context)
+
+    // ViewModel Favoritas
     val peliculasFavoritasViewModel: PeliculasFavoritasViewModel = viewModel(
         factory = PeliculasFavoritasViewModelFactory(firestoreManager, auth)
     )
+
+    // ViewModel Watch List
     val watchListViewModel: WatchListViewModel = viewModel(
         factory = WatchListViewModelFactory(firestoreManager, auth)
+    )
+
+    // ViewModel Vistas
+    val peliculasVistasViewModel: PeliculasVistasViewModel = viewModel(
+        factory = PeliculasVistasViewModelFactory(firestoreManager, auth)
     )
 
     NavHost(navController = navController, startDestination = Inicio) {
@@ -118,7 +132,8 @@ fun Navegacion(auth: AuthManager) {
                 navigateToListaFecha = { navController.navigate(ListaFecha) },
                 navigateToListaGenero = { navController.navigate(ListaGenero) },
                 navigateToProximosEstrenos = { navController.navigate(ProximosEstrenos) },
-                navigateToEnCine = { navController.navigate(EnCines) }
+                navigateToEnCine = { navController.navigate(EnCines) },
+                navigateToVistas = { navController.navigate(PeliculasVistas) }
             )
         }
 
@@ -142,6 +157,17 @@ fun Navegacion(auth: AuthManager) {
                 firestore = firestoreManager,
                 navigateToDetail = { id ->
                     navController.navigate(Detail(id))
+                },
+                navigateToVistas = { navController.navigate(PeliculasVistas) }
+            )
+        }
+
+        composable<PeliculasVistas> {
+            PeliculasVistasScreen(
+                auth = auth,
+                firestore = firestoreManager,
+                navigateToDetail = { id ->
+                    navController.navigate(Detail(id))
                 }
             )
         }
@@ -158,7 +184,8 @@ fun Navegacion(auth: AuthManager) {
                 proximosEstrenosViewModel = proximosEstrenosViewModel,
                 navigateBack = { navController.popBackStack() },
                 auth = auth,
-                watchListViewModel = watchListViewModel
+                watchListViewModel = watchListViewModel,
+                peliculasVistasViewModel = peliculasVistasViewModel
             )
         }
 
