@@ -471,7 +471,7 @@ fun DetailScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                        .padding(vertical = 8.dp)
                                 ) {
                                     Box(
                                         modifier = Modifier
@@ -480,20 +480,12 @@ fun DetailScreen(
                                                 color = Color(0xFF2A2A2A),
                                                 shape = RoundedCornerShape(8.dp)
                                             )
-                                            .padding(16.dp)
+                                            .padding(horizontal = 16.dp, vertical = 8.dp)
                                     ) {
                                         Column(
                                             modifier = Modifier.fillMaxWidth(),
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
-                                            Text(
-                                                text = "Tu valoración:",
-                                                color = Color.White,
-                                                fontSize = 16.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                modifier = Modifier.padding(bottom = 8.dp),
-                                                textAlign = TextAlign.Center
-                                            )
                                             Estrellas(
                                                 valoracion = localValoracion,
                                                 onValoracionSelected = { valoracion ->
@@ -506,6 +498,14 @@ fun DetailScreen(
                                                     }
                                                 },
                                                 modifier = Modifier.fillMaxWidth()
+                                            )
+                                            Text(
+                                                text = "Valorar",
+                                                color = Color.LightGray,
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.padding(top = 2.dp),
+                                                textAlign = TextAlign.Center
                                             )
                                         }
                                     }
@@ -651,14 +651,14 @@ private fun Estrellas(
                     val nuevaValoracion = if (index + 1 == valoracion) 0 else (index + 1)
                     onValoracionSelected(nuevaValoracion)
                 },
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(32.dp)
             ) {
                 Icon(
                     imageVector = Icons.Filled.Star,
                     contentDescription = "Estrella ${index + 1}",
                     tint = if (index < valoracion) Color(0xFFFFD700) else Color.Gray,
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(32.dp)
                         .alpha(if (index < valoracion) 1f else 0.3f)
                 )
             }
