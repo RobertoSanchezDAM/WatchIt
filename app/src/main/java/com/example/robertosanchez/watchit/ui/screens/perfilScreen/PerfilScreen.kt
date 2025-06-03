@@ -168,7 +168,7 @@ fun PerfilScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Debes iniciar sesión para ver tus películas favoritas.",
+                        text = "Debes iniciar sesión para ver/guardar tus películas favoritas.",
                         fontSize = 18.sp,
                         color = Color.Gray,
                         textAlign = TextAlign.Center

@@ -132,7 +132,7 @@ fun WatchListScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Debes iniciar sesión para ver tu lista de películas",
+                        text = "Debes iniciar sesión para ver/modificar tu lista de películas",
                         fontSize = 18.sp,
                         color = Color.Gray,
                         textAlign = TextAlign.Center
