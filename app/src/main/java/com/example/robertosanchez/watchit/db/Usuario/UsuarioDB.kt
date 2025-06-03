@@ -5,7 +5,6 @@ import androidx.room.Entity
 @Entity
 data class UsuarioDB(
     val userId: String = "",
-    val numPeliculasVistas: Int = 0,
     val valoracionMedia: Int = 0,
 )
 

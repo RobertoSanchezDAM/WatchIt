@@ -29,6 +29,9 @@ import com.example.robertosanchez.watchit.R
 import com.example.robertosanchez.watchit.db.FirestoreManager
 import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.PeliculasVistasViewModel
+import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.PeliculasVistasViewModelFactory
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,12 +44,17 @@ fun PerfilScreen(
 ) {
     val user = auth.getCurrentUser()
     var peliculasFavoritas by remember { mutableStateOf<List<Pelicula>>(emptyList()) }
+    val peliculasVistasViewModel: PeliculasVistasViewModel = viewModel(
+        factory = PeliculasVistasViewModelFactory(firestore, auth)
+    )
+    val peliculasVistas by peliculasVistasViewModel.uiState.collectAsState()
 
     LaunchedEffect(user) {
         if (user != null) {
             firestore.getFavoriteMovies(user.uid).collect { peliculas ->
                 peliculasFavoritas = peliculas
             }
+            peliculasVistasViewModel.loadVistas()
         } else {
             peliculasFavoritas = emptyList()
         }
@@ -233,8 +241,7 @@ fun PerfilScreen(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Numero",
-                        color = Color.Blue,
+                        text = peliculasVistas.peliculas.size.toString(),
                         fontSize = 14.sp,
                         modifier = Modifier
                             .clickable { navigateToVistas() }

@@ -80,5 +80,12 @@ class FirestoreManager(auth: AuthManager, context: Context) {
             .update("estrellas", rating)
             .await()
     }
+
+    suspend fun updateNumPeliculasVistas(userId: String, count: Int) {
+        firestore.collection("usuarios")
+            .document(userId)
+            .update("numPeliculasVistas", count)
+            .await()
+    }
 }
 

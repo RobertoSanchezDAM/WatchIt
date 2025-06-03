@@ -18,6 +18,7 @@ class PeliculasVistasViewModel (
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+    private var allPeliculas = listOf<PeliculasVistas>()
 
     init {
         loadVistas()
@@ -31,6 +32,7 @@ class PeliculasVistasViewModel (
             if (currentUserId != null) {
                 try {
                     firestore.getVistas(currentUserId).collect { peliculas ->
+                        allPeliculas = peliculas
                         _uiState.update { uiState ->
                             uiState.copy(
                                 peliculas = peliculas.take(4),
@@ -54,25 +56,16 @@ class PeliculasVistasViewModel (
             return false
         }
 
-        if (_uiState.value.peliculas.any { it.peliculaId == movie.peliculaId }) {
+        if (allPeliculas.any { it.peliculaId == movie.peliculaId }) {
             return false
-        }
-
-        _uiState.update { currentState ->
-            currentState.copy(
-                peliculas = currentState.peliculas + movie
-            )
         }
 
         viewModelScope.launch {
             try {
                 firestore.addVistas(currentUserId, movie)
+                // El contador se actualizará automáticamente cuando se actualice la lista
             } catch (e: Exception) {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        peliculas = currentState.peliculas.filter { it.peliculaId != movie.peliculaId }
-                    )
-                }
+                // Manejar el error si es necesario
             }
         }
         return true
@@ -82,21 +75,12 @@ class PeliculasVistasViewModel (
         val currentUserId = authManager.getCurrentUser()?.uid
 
         if (currentUserId != null) {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    peliculas = currentState.peliculas.filter { it.peliculaId != movie.peliculaId }
-                )
-            }
-
             viewModelScope.launch {
                 try {
                     firestore.removeVistas(currentUserId, movie)
+                    // El contador se actualizará automáticamente cuando se actualice la lista
                 } catch (e: Exception) {
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            peliculas = currentState.peliculas + movie
-                        )
-                    }
+                    // Manejar el error si es necesario
                 }
             }
         }
