@@ -662,7 +662,7 @@ fun DetailScreen(
                     )
 
                     // Campo para escribir review
-                    if (user != null) {
+                    if (user != null && !user.isAnonymous) {
                         OutlinedTextField(
                             value = reviewText,
                             onValueChange = { reviewText = it },
@@ -715,7 +715,10 @@ fun DetailScreen(
                         }
                     } else {
                         Text(
-                            text = "Inicia sesión para escribir una review",
+                            text = if (user?.isAnonymous == true) 
+                                "Inicia sesión para escribir una review" 
+                            else 
+                                "Inicia sesión para escribir una review",
                             color = Color.Gray,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
