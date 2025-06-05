@@ -135,24 +135,40 @@ fun PeliculasVistasScreen (
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Debes iniciar sesión para ver tu lista de películas",
+                        text = "Inicia sesión para ver y guardar tus películas vistas",
                         fontSize = 18.sp,
                         color = Color.Gray,
                         textAlign = TextAlign.Center
                     )
                 }
             } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    modifier = Modifier
-                        .padding(bottom = 15.dp)
-                ) {
-                    items(peliculasVer) { pelicula ->
-                        PeliculaItem(
-                            pelicula,
-                            navigateToDetail
+                if (peliculasVer.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "No has visto ninguna película todavía",
+                            fontSize = 18.sp,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
                         )
-
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(4),
+                        modifier = Modifier
+                            .padding(bottom = 15.dp)
+                    ) {
+                        items(peliculasVer) { pelicula ->
+                            PeliculaItem(
+                                pelicula,
+                                navigateToDetail
+                            )
+                        }
                     }
                 }
             }

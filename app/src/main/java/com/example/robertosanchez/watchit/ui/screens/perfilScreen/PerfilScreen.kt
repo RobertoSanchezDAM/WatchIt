@@ -240,13 +240,32 @@ fun PerfilScreen(
                     fontSize = 16.sp
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = peliculasVistas.peliculas.size.toString(),
-                        fontSize = 14.sp,
-                        modifier = Modifier
-                            .clickable { navigateToVistas() }
-                            .padding(end = 8.dp)
-                    )
+                    if (user?.isAnonymous == true) {
+                        Text(
+                            text = "Inicia sesión para ver/guardar tus películas",
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                        )
+                    } else if (peliculasVistas.peliculas.isEmpty()) {
+                        Text(
+                            text = "0",
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            modifier = Modifier
+                                .clickable { navigateToVistas() }
+                                .padding(end = 8.dp)
+                        )
+                    } else {
+                        Text(
+                            text = peliculasVistas.peliculas.size.toString(),
+                            fontSize = 14.sp,
+                            modifier = Modifier
+                                .clickable { navigateToVistas() }
+                                .padding(end = 8.dp)
+                        )
+                    }
                 }
             }
         }
