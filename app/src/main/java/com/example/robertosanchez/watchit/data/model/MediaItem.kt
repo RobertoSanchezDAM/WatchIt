@@ -7,5 +7,5 @@ data class MediaItem(
     val title: String,
     val sinopsis: String,
     val poster_fondo: String,
-    val genre_ids: List<Int>
+    val generos_ids: List<Int>
 )

@@ -1,8 +1,9 @@
 package com.example.robertosanchez.watchit.ui.screens.detailScreen
 
 import android.annotation.SuppressLint
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Toast
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,7 +57,15 @@ import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.Pelic
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.viewinterop.AndroidView
+import com.example.robertosanchez.watchit.repositories.models.CastMember
+import com.example.robertosanchez.watchit.repositories.models.WatchProviders
+import com.example.robertosanchez.watchit.repositories.models.MovieVideosResponse
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.filled.PlayArrow
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "NewApi")
@@ -110,11 +119,17 @@ fun DetailScreen(
     val detailGeneroViewModel: DetailGeneroViewModel = viewModel()
     val listaGenero by detailGeneroViewModel.lista.observeAsState(emptyList())
 
-    val creditsViewModel: DetailCreditsViewModel = viewModel()
-    val credits by creditsViewModel.credits.observeAsState()
+    val creditosViewModel: DetailCreditosViewModel = viewModel()
+    val creditos by creditosViewModel.creditos.observeAsState()
 
-    val imagesViewModel: DetailImagesViewModel = viewModel()
-    val images by imagesViewModel.images.observeAsState()
+    val plataformasViewModel: DetailPlataformasViewModel = viewModel()
+    val credits by plataformasViewModel.plataformas.observeAsState()
+
+    val videosViewModel: DetailVideosViewModel = viewModel()
+    val videos by videosViewModel.videos.observeAsState()
+
+    val imagenesViewModel: DetailImagenesViewModel = viewModel()
+    val imagenes by imagenesViewModel.imagenes.observeAsState()
 
     val generos = mapOf(
         28 to "Acción",
@@ -139,8 +154,10 @@ fun DetailScreen(
     )
 
     LaunchedEffect(id) {
-        creditsViewModel.fetchCredits(id)
-        imagesViewModel.fetchImages(id)
+        creditosViewModel.fetchCreditos(id)
+        imagenesViewModel.fetchImagenes(id)
+        plataformasViewModel.fetchPlataformas(id)
+        videosViewModel.fetchVideos(id)
     }
 
     // Efecto separado para buscar la película por ID si no está en las listas
@@ -162,7 +179,7 @@ fun DetailScreen(
         listaGenero.find { it.id == id }
     }
 
-    val generosId = pelicula?.genre_ids ?: emptyList()
+    val generosId = pelicula?.generos_ids ?: emptyList()
     val generosNombre = generosId.mapNotNull { generos[it] }
 
     Scaffold(
@@ -241,8 +258,8 @@ fun DetailScreen(
             item {
                 if (pelicula != null) {
                     Box(modifier = Modifier.fillMaxWidth()) {
-                        val backdropPath = images?.backdrops?.maxByOrNull { it.width ?: 0 }?.file_path
-                            ?: images?.posters?.maxByOrNull { it.width ?: 0 }?.file_path
+                        val backdropPath = imagenes?.backdrops?.maxByOrNull { it.width ?: 0 }?.file_path
+                            ?: imagenes?.posters?.maxByOrNull { it.width ?: 0 }?.file_path
                             ?: pelicula.poster
                         Image(
                             painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original$backdropPath"),
@@ -281,9 +298,9 @@ fun DetailScreen(
                                     painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/original${pelicula.poster}"),
                                     contentDescription = null,
                                     modifier = Modifier
-                                        .width(110.dp)
-                                        .height(150.dp)
-                                        .clip(RoundedCornerShape(8.dp))
+                                        .width(120.dp)
+                                        .height(180.dp)
+                                        .clip(RoundedCornerShape(4.dp))
                                 )
 
                                 Spacer(modifier = Modifier.width(16.dp))
@@ -296,7 +313,7 @@ fun DetailScreen(
                                         fontWeight = FontWeight.Bold
                                     )
 
-                                    credits?.let { cr ->
+                                    creditos?.let { cr ->
                                         val director = cr.crew.find { it.job == "Director" }
                                         director?.let {
                                             Text(
@@ -307,19 +324,17 @@ fun DetailScreen(
                                         }
                                     }
 
-                                    Spacer(modifier = Modifier.height(16.dp))
-
-                                    Text(pelicula.release_date, color = Color.LightGray, fontSize = 14.sp)
-
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(pelicula.release_date, color = Color(0xFF838383), fontSize = 14.sp)
 
                                     if (generosNombre.isNotEmpty()) {
                                         Text(
                                             text = generosNombre.joinToString(", "),
-                                            color = Color.LightGray,
+                                            color = Color(0xFF838383),
                                             fontSize = 12.sp,
                                         )
                                     }
+
+                                    VideosSection(videos)
                                 }
                             }
 
@@ -554,7 +569,7 @@ fun DetailScreen(
                                 }
                             }
 
-                            credits?.cast?.take(10)?.let { castList ->
+                            creditos?.cast?.let { castList ->
                                 Spacer(modifier = Modifier.height(16.dp))
 
                                 Text(
@@ -564,52 +579,22 @@ fun DetailScreen(
                                     fontSize = 18.sp,
                                     modifier = Modifier.padding(bottom = 8.dp)
                                 )
+
                                 Row(
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .horizontalScroll(rememberScrollState()),
                                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
-                                    castList.forEach { actor ->
-                                        Column(
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            modifier = Modifier.width(60.dp)
-                                        ) {
-                                            val profileUrl = actor.profile_path?.let { "https://image.tmdb.org/t/p/w185$it" }
-                                            if (profileUrl != null) {
-                                                Image(
-                                                    painter = rememberAsyncImagePainter(profileUrl),
-                                                    contentDescription = actor.name,
-                                                    modifier = Modifier
-                                                        .size(48.dp)
-                                                        .clip(CircleShape),
-                                                    contentScale = ContentScale.Crop
-                                                )
-                                            } else {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .size(48.dp)
-                                                        .clip(CircleShape)
-                                                        .background(Color.Gray),
-                                                    contentAlignment = Alignment.Center
-                                                ) {
-                                                    Text(
-                                                        text = actor.name,
-                                                        color = Color.White,
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                }
-                                            }
-                                            Text(
-                                                text = actor.name,
-                                                color = Color.White,
-                                                fontSize = 12.sp,
-                                                modifier = Modifier.fillMaxWidth(),
-                                                maxLines = 2,
-                                                textAlign = TextAlign.Center,
-                                                lineHeight = 1.5.em
-                                            )
-                                            Spacer(modifier = Modifier.height(100.dp))
-                                        }
-                                    }
+                                    CastSeccion(castList)
+                                }
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    PlataformasSeccion(credits)
                                 }
                             }
                         }
@@ -661,6 +646,190 @@ private fun Estrellas(
                         .size(32.dp)
                         .alpha(if (index < valoracion) 1f else 0.3f)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun CastSeccion(castList: List<CastMember>) {
+    castList.forEach { actor ->
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.width(60.dp)
+        ) {
+            val profileUrl = actor.profile_path?.let { "https://image.tmdb.org/t/p/w185$it" }
+            if (profileUrl != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(profileUrl),
+                    contentDescription = actor.name,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.Gray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = actor.name,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            Text(
+                text = actor.name,
+                color = Color.White,
+                fontSize = 12.sp,
+                modifier = Modifier.fillMaxWidth(),
+                maxLines = 2,
+                textAlign = TextAlign.Center,
+                lineHeight = 1.5.em
+            )
+        }
+    }
+}
+
+@Composable
+fun PlataformasSeccion(plataformas: WatchProviders?) {
+    val esProviders = plataformas?.results?.get("ES")
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = "Donde Ver",
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        
+        if (esProviders != null) {
+            // Streaming
+            if (!esProviders.flatrate.isNullOrEmpty()) {
+                Text(
+                    text = "Streaming",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    esProviders.flatrate.forEach { provider ->
+                        AsyncImage(
+                            model = "https://image.tmdb.org/t/p/original${provider.logo_path}",
+                            contentDescription = provider.provider_name,
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                    }
+                }
+            }
+            
+            // Alquiler
+            if (!esProviders.rent.isNullOrEmpty()) {
+                Text(
+                    text = "Alquiler",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    esProviders.rent.forEach { provider ->
+                        AsyncImage(
+                            model = "https://image.tmdb.org/t/p/original${provider.logo_path}",
+                            contentDescription = provider.provider_name,
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                    }
+                }
+            }
+            
+            // Compra
+            if (!esProviders.buy.isNullOrEmpty()) {
+                Text(
+                    text = "Compra",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    esProviders.buy.forEach { provider ->
+                        AsyncImage(
+                            model = "https://image.tmdb.org/t/p/original${provider.logo_path}",
+                            contentDescription = provider.provider_name,
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                    }
+                }
+            }
+        } else {
+            Text(
+                text = "No disponible en streaming en España",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray
+            )
+        }
+    }
+}
+
+@Composable
+fun VideosSection(videos: MovieVideosResponse?) {
+    val trailer = videos?.results?.find { it.type == "Trailer" && it.site == "YouTube" }
+    val context = LocalContext.current
+    
+    if (trailer != null) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Button(
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=${trailer.key}"))
+                    context.startActivity(intent)
+                },
+                modifier = Modifier
+                    .width(145.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF3B82F6)
+                )
+            ) {
+                Row {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = "Play",
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Ver Tráiler",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

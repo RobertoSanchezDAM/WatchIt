@@ -4,6 +4,8 @@ import com.example.robertosanchez.watchit.repositories.models.CreditsResponse
 import com.example.robertosanchez.watchit.repositories.models.MovieImagesResponse
 import com.example.robertosanchez.watchit.repositories.models.RemoteResult
 import com.example.robertosanchez.watchit.repositories.models.MovieDetail
+import com.example.robertosanchez.watchit.repositories.models.WatchProviders
+import com.example.robertosanchez.watchit.repositories.models.MovieVideosResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.http.Path
@@ -22,13 +24,19 @@ interface RemoteService {
     ): RemoteResult
 
     @GET("movie/{movie_id}/credits")
-    suspend fun getMovieCredits(
+    suspend fun getCreditos(
         @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String
     ): CreditsResponse
 
+    @GET("movie/{movie_id}/watch/providers")
+    suspend fun getPlataformas(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String
+    ): WatchProviders
+
     @GET("movie/{movie_id}/images")
-    suspend fun getImages(
+    suspend fun getImagenes(
         @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String
     ): MovieImagesResponse
@@ -84,4 +92,11 @@ interface RemoteService {
         @Query("api_key") apiKey: String,
         @Query("language") language: String = "es-ES"
     ): MovieDetail
+
+    @GET("movie/{movie_id}/videos")
+    suspend fun getVideos(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = "es-ES"
+    ): MovieVideosResponse
 }
