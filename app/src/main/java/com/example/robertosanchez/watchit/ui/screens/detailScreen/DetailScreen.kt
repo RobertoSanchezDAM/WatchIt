@@ -482,7 +482,7 @@ fun DetailScreen(
 
                             if (localVistaState) {
                                 var localValoracion by remember { mutableStateOf(peliculasVistasViewModel.getRating(id)) }
-                                
+
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -569,6 +569,12 @@ fun DetailScreen(
                                 }
                             }
 
+                            Divider(
+                                color = Color.Gray.copy(alpha = 0.3f),
+                                thickness = 1.dp,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
                             creditos?.cast?.let { castList ->
                                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -588,6 +594,15 @@ fun DetailScreen(
                                 ) {
                                     CastSeccion(castList)
                                 }
+
+                               Spacer(modifier = Modifier.height(16.dp))
+
+
+                                Divider(
+                                    color = Color.Gray.copy(alpha = 0.3f),
+                                    thickness = 1.dp,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
 
                                 Spacer(modifier = Modifier.height(16.dp))
 
