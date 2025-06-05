@@ -89,12 +89,12 @@ fun DetailScreen(
     val scope = rememberCoroutineScope()
     val reviewsViewModel: DetailReviewsViewModel = viewModel()
     val reviews by reviewsViewModel.reviews.observeAsState(emptyList())
-    Log.d("Reviews", "${reviews}")
+
     var reviewText by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val isFavorite = peliculasFavoritasViewModel.isFavorite(id)
-    var localFavoriteState by remember { mutableStateOf(isFavorite) }
+    val isFavorita = peliculasFavoritasViewModel.isFavorita(id)
+    var localFavoritaState by remember { mutableStateOf(isFavorita) }
 
     val isAddWatchList = watchListViewModel.isWatchList(id)
     var localWatchListState by remember { mutableStateOf(isAddWatchList) }
@@ -104,7 +104,6 @@ fun DetailScreen(
 
     val context = LocalContext.current
 
-    var showRatingDialog by remember { mutableStateOf(false) }
     LaunchedEffect(user) {
         peliculasFavoritasViewModel.loadFavorites()
         watchListViewModel.loadWatchList()
@@ -112,10 +111,8 @@ fun DetailScreen(
         reviewsViewModel.loadReviews(id)
     }
 
-    Log.d("Reviews", "${reviewsViewModel.loadReviews(id)}")
-
-    LaunchedEffect(user, isFavorite, isAddWatchList, isVista) {
-        localFavoriteState = isFavorite
+    LaunchedEffect(user, isFavorita, isAddWatchList, isVista) {
+        localFavoritaState = isFavorita
         localWatchListState = isAddWatchList
         localVistaState = isVista
     }
@@ -362,9 +359,9 @@ fun DetailScreen(
                                             )
                                         }
                                     } else if (pelicula != null) {
-                                        if (localFavoriteState) {
-                                            localFavoriteState = false
-                                            peliculasFavoritasViewModel.removeFavoriteMovie(
+                                        if (localFavoritaState) {
+                                            localFavoritaState = false
+                                            peliculasFavoritasViewModel.removePeliculaFavorita(
                                                 Pelicula(
                                                     peliculaId = pelicula.id,
                                                     poster = pelicula.poster
@@ -372,9 +369,9 @@ fun DetailScreen(
                                             )
                                             Toast.makeText(context, "Película eliminada de favoritos", Toast.LENGTH_SHORT).show()
                                         } else {
-                                            if (peliculasFavoritasViewModel.canAddMoreFavorites()) {
-                                                localFavoriteState = true
-                                                val success = peliculasFavoritasViewModel.addFavoriteMovie(
+                                            if (peliculasFavoritasViewModel.puedoAnadirMasFavoritas()) {
+                                                localFavoritaState = true
+                                                val success = peliculasFavoritasViewModel.addPeliculaFavorita(
                                                     Pelicula(
                                                         peliculaId = pelicula.id,
                                                         poster = pelicula.poster
@@ -383,7 +380,7 @@ fun DetailScreen(
                                                 if (success) {
                                                     Toast.makeText(context, "Película añadida a favoritos", Toast.LENGTH_SHORT).show()
                                                 } else {
-                                                    localFavoriteState = false
+                                                    localFavoritaState = false
                                                     scope.launch {
                                                         snackbarHostState.showSnackbar(
                                                             message = "No se pudo añadir la película a favoritos",
@@ -403,9 +400,9 @@ fun DetailScreen(
                                     }
                                 }) {
                                     Icon(
-                                        imageVector = if (localFavoriteState) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                                        contentDescription = if (localFavoriteState) "Eliminar de favoritos" else "Añadir a favoritos",
-                                        tint = if (user == null) Color.Gray else if (localFavoriteState) Color.Red else Color.Gray
+                                        imageVector = if (localFavoritaState) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                        contentDescription = if (localFavoritaState) "Eliminar de favoritos" else "Añadir a favoritos",
+                                        tint = if (user == null) Color.Gray else if (localFavoritaState) Color.Red else Color.Gray
                                     )
                                 }
 

@@ -46,7 +46,7 @@ class PeliculasFavoritasViewModel(
         }
     }
 
-    fun addFavoriteMovie(movie: Pelicula): Boolean {
+    fun addPeliculaFavorita(movie: Pelicula): Boolean {
         val currentUserId = authManager.getCurrentUser()?.uid
         
         if (currentUserId == null) {
@@ -69,7 +69,7 @@ class PeliculasFavoritasViewModel(
 
         viewModelScope.launch {
             try {
-                firestore.addFavoriteMovie(currentUserId, movie)
+                firestore.addPeliculaFavorita(currentUserId, movie)
             } catch (e: Exception) {
                 _uiState.update { currentState ->
                     currentState.copy(
@@ -81,7 +81,7 @@ class PeliculasFavoritasViewModel(
         return true
     }
 
-    fun removeFavoriteMovie(movie: Pelicula) {
+    fun removePeliculaFavorita(movie: Pelicula) {
         val currentUserId = authManager.getCurrentUser()?.uid
         
         if (currentUserId != null) {
@@ -93,7 +93,7 @@ class PeliculasFavoritasViewModel(
 
             viewModelScope.launch {
                 try {
-                    firestore.removeFavoriteMovie(currentUserId, movie)
+                    firestore.removePeliculaFavorita(currentUserId, movie)
                 } catch (e: Exception) {
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -105,11 +105,11 @@ class PeliculasFavoritasViewModel(
         }
     }
 
-    fun isFavorite(movieId: Int): Boolean {
+    fun isFavorita(movieId: Int): Boolean {
         return _uiState.value.peliculas.any { it.peliculaId == movieId }
     }
 
-    fun canAddMoreFavorites(): Boolean {
+    fun puedoAnadirMasFavoritas(): Boolean {
         return _uiState.value.peliculas.size < 4
     }
 }

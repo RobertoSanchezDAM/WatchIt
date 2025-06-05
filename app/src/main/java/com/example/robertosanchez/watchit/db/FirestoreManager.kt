@@ -22,11 +22,11 @@ class FirestoreManager(auth: AuthManager, context: Context) {
     }
 
     // Peliculas Favoritas (Subcoleccion "peliculas_favoritas")
-    suspend fun addFavoriteMovie(userId: String, movie: Pelicula) {
+    suspend fun addPeliculaFavorita(userId: String, movie: Pelicula) {
         firestore.collection("usuarios").document(userId).collection("peliculas_favoritas").document(movie.peliculaId.toString()).set(movie).await()
     }
 
-    suspend fun removeFavoriteMovie(userId: String, movie: Pelicula) {
+    suspend fun removePeliculaFavorita(userId: String, movie: Pelicula) {
         firestore.collection("usuarios").document(userId).collection("peliculas_favoritas").document(movie.peliculaId.toString()).delete().await()
     }
 
@@ -78,13 +78,6 @@ class FirestoreManager(auth: AuthManager, context: Context) {
             .collection("peliculas_vistas")
             .document(movieId.toString())
             .update("estrellas", rating)
-            .await()
-    }
-
-    suspend fun updateNumPeliculasVistas(userId: String, count: Int) {
-        firestore.collection("usuarios")
-            .document(userId)
-            .update("numPeliculasVistas", count)
             .await()
     }
 }
