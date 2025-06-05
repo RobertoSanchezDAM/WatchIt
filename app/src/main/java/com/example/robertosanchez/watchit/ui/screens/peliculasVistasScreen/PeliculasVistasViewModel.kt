@@ -35,7 +35,7 @@ class PeliculasVistasViewModel (
                         allPeliculas = peliculas
                         _uiState.update { uiState ->
                             uiState.copy(
-                                peliculas = peliculas.take(4),
+                                peliculas = peliculas,
                                 isLoading = false
                             )
                         }
