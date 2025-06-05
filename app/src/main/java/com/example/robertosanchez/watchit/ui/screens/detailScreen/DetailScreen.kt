@@ -63,9 +63,11 @@ import com.example.robertosanchez.watchit.repositories.models.WatchProviders
 import com.example.robertosanchez.watchit.repositories.models.MovieVideosResponse
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.PlayArrow
+import com.example.robertosanchez.watchit.repositories.models.Review
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "NewApi")
@@ -85,8 +87,12 @@ fun DetailScreen(
 ) {
     val user = auth.getCurrentUser()
     val scope = rememberCoroutineScope()
-
+    val reviewsViewModel: DetailReviewsViewModel = viewModel()
+    val reviews by reviewsViewModel.reviews.observeAsState(emptyList())
+    Log.d("Reviews", "${reviews}")
+    var reviewText by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
+
     val isFavorite = peliculasFavoritasViewModel.isFavorite(id)
     var localFavoriteState by remember { mutableStateOf(isFavorite) }
 
@@ -103,7 +109,10 @@ fun DetailScreen(
         peliculasFavoritasViewModel.loadFavorites()
         watchListViewModel.loadWatchList()
         peliculasVistasViewModel.loadVistas()
+        reviewsViewModel.loadReviews(id)
     }
+
+    Log.d("Reviews", "${reviewsViewModel.loadReviews(id)}")
 
     LaunchedEffect(user, isFavorite, isAddWatchList, isVista) {
         localFavoriteState = isFavorite
@@ -253,7 +262,8 @@ fun DetailScreen(
     ) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .background(Color(0xFF1E1E1E))
         ) {
             item {
                 if (pelicula != null) {
@@ -630,6 +640,105 @@ fun DetailScreen(
                     }
                 }
             }
+
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Divider(
+                    color = Color.Gray.copy(alpha = 0.3f),
+                    thickness = 1.dp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Sección de Reviews
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = "Reviews",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    // Campo para escribir review
+                    if (user != null) {
+                        OutlinedTextField(
+                            value = reviewText,
+                            onValueChange = { reviewText = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
+                            placeholder = { Text("Escribe tu review...", color = Color.Gray) },
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                cursorColor = Color.White,
+                                focusedBorderColor = Color.White,
+                                unfocusedBorderColor = Color.Gray
+                            ),
+                            maxLines = 3
+                        )
+
+                        Button(
+                            onClick = {
+                                if (reviewText.isNotBlank()) {
+                                    val review = Review(
+                                        movieId = id,
+                                        userId = user.uid,
+                                        userName = user.displayName ?: "Usuario",
+                                        userPhotoUrl = user.photoUrl?.toString(),
+                                        text = reviewText
+                                    )
+                                    reviewsViewModel.addReview(
+                                        review = review,
+                                        onSuccess = {
+                                            reviewText = ""
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar("Review añadida con éxito")
+                                            }
+                                        },
+                                        onError = { error ->
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(error)
+                                            }
+                                        }
+                                    )
+                                }
+                            },
+                            modifier = Modifier
+                                .align(Alignment.End)
+                                .padding(bottom = 16.dp),
+                            enabled = reviewText.isNotBlank()
+                        ) {
+                            Text("Enviar Review")
+                        }
+                    } else {
+                        Text(
+                            text = "Inicia sesión para escribir una review",
+                            color = Color.Gray,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                    }
+
+                    // Lista de reviews
+                    if (reviews.isEmpty()) {
+                        Text(
+                            text = "No hay reviews todavía. ¡Sé el primero en escribir una!",
+                            color = Color.Gray,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    } else {
+                        reviews.forEach { review ->
+                            ReviewItem(review = review)
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -846,6 +955,82 @@ fun VideosSection(videos: MovieVideosResponse?) {
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ReviewItem(review: Review) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF2A2A2A)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Foto de perfil
+                if (review.userPhotoUrl != null) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(review.userPhotoUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Foto de perfil",
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(Color.Gray),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = review.userName.first().toString(),
+                            color = Color.White,
+                            fontSize = 20.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = review.userName,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
+                            .format(java.util.Date(review.timestamp)),
+                        color = Color.Gray,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = review.text,
+                color = Color.White,
+                fontSize = 14.sp
+            )
         }
     }
 }
