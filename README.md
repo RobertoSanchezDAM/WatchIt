@@ -7,4 +7,4 @@ Usuarios para el testing:
 - Incognito
 - Usuarios ya creados:
     - Usuario: admin@watchit.com
-    - Contraseña: admin
+    - Contraseña: admin1234
