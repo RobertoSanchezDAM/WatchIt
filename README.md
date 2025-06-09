@@ -6,5 +6,5 @@ Usuarios para el testing:
 - Google (cualquiera)
 - Incognito
 - Usuarios ya creados:
-    - Usuario: usuariowatchit@prueba.com
-    - Contraseña: watchitprueba
+    - Usuario: admin@watchit.com
+    - Contraseña: admin
