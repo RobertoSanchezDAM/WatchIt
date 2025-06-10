@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
@@ -53,7 +55,8 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 fun PeliculasVistasScreen (
     auth: AuthManager,
     firestore: FirestoreManager,
-    navigateToDetail: (Int) -> Unit
+    navigateToDetail: (Int) -> Unit,
+    navigateBack: () -> Unit
 ) {
     val user = auth.getCurrentUser()
     var peliculasVer by remember { mutableStateOf<List<PeliculasVistas>>(emptyList()) }
@@ -77,12 +80,24 @@ fun PeliculasVistasScreen (
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        IconButton(
+                            onClick = navigateBack,
+                            modifier = Modifier
+                                .align(Alignment.Top)
+                                .zIndex(1f)
+                        ) {
+                            Icon(
+                                Icons.Filled.ArrowBack,
+                                contentDescription = "Atrás",
+                                tint = Color.Black
+                            )
+                        }
+
                         Text(
                             text = "Películas Vistas",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = Color.Black.copy(alpha = 0.8f),
-                            modifier = Modifier.padding(top = 8.dp)
+                            color = Color.Black.copy(alpha = 0.8f)
                         )
 
                         if (user?.photoUrl != null) {

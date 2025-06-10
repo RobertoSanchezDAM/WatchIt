@@ -45,6 +45,24 @@ class ReviewsUsuarioViewModel(
             }
         }
     }
+
+    fun loadReviewsUsuario(userId: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                firestore.getUserReviews(userId).collect { reviews ->
+                    _uiState.update { uiState -> 
+                        uiState.copy(
+                            reviews = reviews,
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
 }
 
 data class UiState(

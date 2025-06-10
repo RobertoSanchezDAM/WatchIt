@@ -64,6 +64,7 @@ import com.example.robertosanchez.watchit.repositories.models.MovieVideosRespons
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.Delete
@@ -86,6 +87,7 @@ fun DetailScreen(
     peliculasVistasViewModel: PeliculasVistasViewModel,
     navigateBack: () -> Unit,
     auth: AuthManager,
+    navigateToPerfilUsuario: (String, String, String?) -> Unit
 ) {
     val user = auth.getCurrentUser()
     val scope = rememberCoroutineScope()
@@ -742,7 +744,8 @@ fun DetailScreen(
                             ReviewItem(
                                 review = review,
                                 auth = auth,
-                                snackbarHostState = snackbarHostState
+                                snackbarHostState = snackbarHostState,
+                                navigateToPerfilUsuario = navigateToPerfilUsuario
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
@@ -974,11 +977,11 @@ fun VideosSection(videos: MovieVideosResponse?) {
 fun ReviewItem(
     review: Review,
     auth: AuthManager,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    navigateToPerfilUsuario: (String, String, String?) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val reviewsViewModel: DetailReviewsViewModel = viewModel()
-    val user = auth.getCurrentUser()
     var isEditing by remember { mutableStateOf(false) }
     var editedText by remember { mutableStateOf(review.text) }
 
@@ -1001,7 +1004,10 @@ fun ReviewItem(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { 
+                        navigateToPerfilUsuario(review.userId, review.userName, review.userPhotoUrl)
+                    }
                 ) {
                     // Foto de perfil
                     if (review.userPhotoUrl != null) {
@@ -1050,7 +1056,7 @@ fun ReviewItem(
                 }
 
                 // Botones de editar y eliminar (solo para el autor de la review)
-                if (user?.uid == review.userId) {
+                if (auth.getCurrentUser()?.uid == review.userId) {
                     Row {
                         IconButton(
                             onClick = {
@@ -1066,37 +1072,9 @@ fun ReviewItem(
                                 modifier = Modifier.size(20.dp)
                             )
                         }
-                        IconButton(
-                            onClick = {
-                                reviewsViewModel.deleteReview(
-                                    reviewId = review.id,
-                                    movieId = review.movieId,
-                                    onSuccess = {
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar("Review eliminada con éxito")
-                                        }
-                                    },
-                                    onError = { error ->
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(error)
-                                        }
-                                    }
-                                )
-                            },
-                            modifier = Modifier.size(32.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Eliminar review",
-                                tint = Color.LightGray,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             if (isEditing) {
                 OutlinedTextField(
@@ -1104,7 +1082,7 @@ fun ReviewItem(
                     onValueChange = { editedText = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp),
+                        .padding(vertical = 8.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedTextColor = Color.White,
                         unfocusedTextColor = Color.White,
@@ -1114,8 +1092,11 @@ fun ReviewItem(
                     ),
                     maxLines = 3
                 )
+
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(
@@ -1126,14 +1107,18 @@ fun ReviewItem(
                     ) {
                         Text("Cancelar", color = Color.Gray)
                     }
-                    TextButton(
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
                         onClick = {
+                            val updatedReview = review.copy(text = editedText)
                             reviewsViewModel.updateReview(
-                                review = review.copy(text = editedText),
+                                review = updatedReview,
                                 onSuccess = {
                                     isEditing = false
                                     scope.launch {
-                                        snackbarHostState.showSnackbar("Review editada")
+                                        snackbarHostState.showSnackbar("Review actualizada con éxito")
                                     }
                                 },
                                 onError = { error ->
@@ -1142,16 +1127,19 @@ fun ReviewItem(
                                     }
                                 }
                             )
-                        }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF3B82F6)
+                        )
                     ) {
-                        Text("Guardar", color = Color.White)
+                        Text("Guardar")
                     }
                 }
             } else {
                 Text(
                     text = review.text,
                     color = Color.White,
-                    fontSize = 14.sp
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
         }

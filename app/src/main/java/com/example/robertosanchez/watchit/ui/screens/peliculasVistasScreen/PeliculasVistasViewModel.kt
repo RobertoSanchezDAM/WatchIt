@@ -28,12 +28,11 @@ class PeliculasVistasViewModel (
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val currentUserId = authManager.getCurrentUser()?.uid
-
+            
             if (currentUserId != null) {
                 try {
                     firestore.getVistas(currentUserId).collect { peliculas ->
-                        allPeliculas = peliculas
-                        _uiState.update { uiState ->
+                        _uiState.update { uiState -> 
                             uiState.copy(
                                 peliculas = peliculas,
                                 isLoading = false
@@ -44,6 +43,24 @@ class PeliculasVistasViewModel (
                     _uiState.update { it.copy(isLoading = false) }
                 }
             } else {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    fun loadVistasUsuario(userId: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                firestore.getVistas(userId).collect { peliculas ->
+                    _uiState.update { uiState -> 
+                        uiState.copy(
+                            peliculas = peliculas,
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false) }
             }
         }

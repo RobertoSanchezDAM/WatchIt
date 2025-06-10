@@ -47,6 +47,7 @@ import com.example.robertosanchez.watchit.ui.screens.reviewsUsuarioScreen.Review
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListScreen
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModel
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModelFactory
+import com.example.robertosanchez.watchit.ui.screens.perfilUsuarioSelectScreen.PerfilUsuarioSelectScreen
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -171,7 +172,8 @@ fun Navegacion(auth: AuthManager) {
                 firestore = firestoreManager,
                 navigateToDetail = { id ->
                     navController.navigate(Detail(id))
-                }
+                },
+                navigateBack = { navController.popBackStack() },
             )
         }
 
@@ -199,7 +201,10 @@ fun Navegacion(auth: AuthManager) {
                 navigateBack = { navController.popBackStack() },
                 auth = auth,
                 watchListViewModel = watchListViewModel,
-                peliculasVistasViewModel = peliculasVistasViewModel
+                peliculasVistasViewModel = peliculasVistasViewModel,
+                navigateToPerfilUsuario = { userId, userName, userPhotoUrl ->
+                    navController.navigate(PerfilUsuarioSelect(userId, userName, userPhotoUrl))
+                }
             )
         }
 
@@ -310,6 +315,21 @@ fun Navegacion(auth: AuthManager) {
                 auth = auth,
                 navigateToDetail = { id -> navController.navigate(Detail(id)) },
                 navigateBack = { navController.popBackStack() },
+            )
+        }
+
+        composable<PerfilUsuarioSelect> { backStackEntry ->
+            val perfilUsuarioSelect = backStackEntry.toRoute<PerfilUsuarioSelect>()
+            PerfilUsuarioSelectScreen(
+                userId = perfilUsuarioSelect.userId,
+                userName = perfilUsuarioSelect.userName,
+                userPhotoUrl = perfilUsuarioSelect.userPhotoUrl,
+                auth = auth,
+                firestore = firestoreManager,
+                navigateToDetail = { id ->
+                    navController.navigate(Detail(id))
+                },
+                navigateBack = { navController.popBackStack() }
             )
         }
     }

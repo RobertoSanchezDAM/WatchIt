@@ -58,3 +58,10 @@ object ProximosEstrenos
 
 @Serializable
 object EnCines
+
+@Serializable
+data class PerfilUsuarioSelect(
+    val userId: String,
+    val userName: String,
+    val userPhotoUrl: String?
+)
