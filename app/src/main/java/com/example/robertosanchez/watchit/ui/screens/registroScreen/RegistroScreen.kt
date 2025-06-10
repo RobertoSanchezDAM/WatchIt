@@ -120,7 +120,7 @@ fun RegistroScreen(auth: AuthManager, firestoreManager: FirestoreManager, naviga
                 TextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email") },
+                    label = { Text("Correo Electrónico") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     shape = RoundedCornerShape(5.dp)
@@ -131,7 +131,7 @@ fun RegistroScreen(auth: AuthManager, firestoreManager: FirestoreManager, naviga
                 TextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password") },
+                    label = { Text("Contraseña") },
                     modifier = Modifier.fillMaxWidth(),
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

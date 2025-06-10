@@ -107,7 +107,7 @@ fun ContrasenaOlvScreen(auth: AuthManager, navigateToLogin: () -> Unit) {
             TextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text("Correo Electrónico") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 shape = RoundedCornerShape(5.dp)
             )

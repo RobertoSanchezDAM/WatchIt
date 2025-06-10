@@ -153,7 +153,7 @@ fun PerfilScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = if (user?.isAnonymous == true) "Anónimo" else (user?.displayName ?: "Usuario"),
+                text = if (user?.isAnonymous == true) "Anónimo" else (user?.displayName ?: "Anónimo"),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -162,23 +162,44 @@ fun PerfilScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = if (user?.isAnonymous == true) "correo anónimo" else (user?.email ?: "Email no disponible"),
+                text = if (user?.isAnonymous == true) "Email no disponible" else (user?.email ?: "Email no disponible"),
                 fontSize = 16.sp,
                 color = Color.White.copy(alpha = 0.8f)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(50.dp))
 
             if (user?.isAnonymous == true) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
+                        .padding(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Debes iniciar sesión para ver/guardar tus películas favoritas.",
-                        fontSize = 18.sp,
+                        text = "Debes iniciar sesión para:",
+                        fontSize = 22.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(22.dp))
+
+                    Text(
+                        text = "Ver/guardar tus películas favoritas.",
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "Ver/guardar tus películas vistas.",
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "Ver/guardar tus reviews",
+                        fontSize = 14.sp,
                         color = Color.Gray,
                         textAlign = TextAlign.Center
                     )
