@@ -35,21 +35,31 @@ import com.example.robertosanchez.watchit.repositories.models.Review
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 import com.example.robertosanchez.watchit.repositories.RemoteConnection
 import kotlinx.coroutines.launch
+import androidx.lifecycle.viewmodel.compose.viewModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ReviewsUsuarioScreen(
     auth: AuthManager,
     firestore: FirestoreManager,
     navigateToDetail: (Int) -> Unit,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    userId: String? = null
 ) {
     val user = auth.getCurrentUser()
-    val reviewsUsuarioViewModel: ReviewsUsuarioViewModel = remember {
-        ReviewsUsuarioViewModel(firestore, auth)
-    }
+    val reviewsUsuarioViewModel: ReviewsUsuarioViewModel = viewModel(
+        factory = ReviewsUsuarioViewModelFactory(firestore, auth)
+    )
     val reviewsState by reviewsUsuarioViewModel.uiState.collectAsState()
+
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            reviewsUsuarioViewModel.loadReviewsUsuario(userId)
+        } else if (user != null) {
+            reviewsUsuarioViewModel.loadReviews()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -74,7 +84,7 @@ fun ReviewsUsuarioScreen(
                         }
 
                         Text(
-                            text = "Mis Reviews",
+                            text = if (userId != null) "Reviews" else "Mis Reviews",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.Black.copy(alpha = 0.8f)
@@ -121,7 +131,7 @@ fun ReviewsUsuarioScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (user?.isAnonymous == true) {
+            if (reviewsState.reviews.isEmpty()) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -130,22 +140,7 @@ fun ReviewsUsuarioScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Inicia sesión para ver tus reviews",
-                        fontSize = 18.sp,
-                        color = Color.Gray,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            } else if (reviewsState.reviews.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "No has escrito ninguna review todavía",
+                        text = "No hay reviews",
                         fontSize = 18.sp,
                         color = Color.Gray,
                         textAlign = TextAlign.Center
@@ -159,7 +154,10 @@ fun ReviewsUsuarioScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(reviewsState.reviews) { review ->
-                        ReviewItem(review = review, navigateToDetail = navigateToDetail)
+                        ReviewItem(
+                            review = review,
+                            navigateToDetail = navigateToDetail
+                        )
                     }
                 }
             }

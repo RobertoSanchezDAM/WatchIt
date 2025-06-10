@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -48,6 +49,7 @@ import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListSc
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModel
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModelFactory
 import com.example.robertosanchez.watchit.ui.screens.perfilUsuarioSelectScreen.PerfilUsuarioSelectScreen
+import androidx.navigation.navArgument
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -319,17 +321,54 @@ fun Navegacion(auth: AuthManager) {
         }
 
         composable<PerfilUsuarioSelect> { backStackEntry ->
-            val perfilUsuarioSelect = backStackEntry.toRoute<PerfilUsuarioSelect>()
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            val userName = backStackEntry.arguments?.getString("userName") ?: ""
+            val userPhotoUrl = backStackEntry.arguments?.getString("userPhotoUrl")
+            
             PerfilUsuarioSelectScreen(
-                userId = perfilUsuarioSelect.userId,
-                userName = perfilUsuarioSelect.userName,
-                userPhotoUrl = perfilUsuarioSelect.userPhotoUrl,
+                userId = userId,
+                userName = userName,
+                userPhotoUrl = userPhotoUrl,
                 auth = auth,
                 firestore = firestoreManager,
                 navigateToDetail = { id ->
                     navController.navigate(Detail(id))
                 },
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
+                navigateToVistas = { navController.navigate("peliculas_vistas/$userId") },
+                navigateToReviews = { navController.navigate("reviews_usuario/$userId") }
+            )
+        }
+
+        composable(
+            route = "peliculas_vistas/{userId}",
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            PeliculasVistasScreen(
+                auth = auth,
+                firestore = firestoreManager,
+                navigateToDetail = { id ->
+                    navController.navigate(Detail(id))
+                },
+                navigateBack = { navController.popBackStack() },
+                userId = userId
+            )
+        }
+
+        composable(
+            route = "reviews_usuario/{userId}",
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            ReviewsUsuarioScreen(
+                auth = auth,
+                firestore = firestoreManager,
+                navigateToDetail = { id ->
+                    navController.navigate(Detail(id))
+                },
+                navigateBack = { navController.popBackStack() },
+                userId = userId
             )
         }
     }

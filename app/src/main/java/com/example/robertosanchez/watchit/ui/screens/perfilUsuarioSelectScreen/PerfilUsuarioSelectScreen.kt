@@ -46,7 +46,9 @@ fun PerfilUsuarioSelectScreen(
     auth: AuthManager,
     firestore: FirestoreManager,
     navigateToDetail: (Int) -> Unit,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    navigateToVistas: () -> Unit,
+    navigateToReviews: () -> Unit
 ) {
     val user = auth.getCurrentUser()
 
@@ -244,13 +246,17 @@ fun PerfilUsuarioSelectScreen(
                             text = "0",
                             fontSize = 14.sp,
                             color = Color.Gray,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier
+                                .clickable { navigateToVistas() }
+                                .padding(end = 8.dp)
                         )
                     } else {
                         Text(
                             text = peliculasVistas.peliculas.size.toString(),
                             fontSize = 14.sp,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier
+                                .clickable { navigateToVistas() }
+                                .padding(end = 8.dp)
                         )
                     }
                 }
@@ -282,7 +288,9 @@ fun PerfilUsuarioSelectScreen(
                     Text(
                         text = reviewsState.reviews.size.toString(),
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier
+                            .clickable { navigateToReviews() }
+                            .padding(end = 8.dp)
                     )
                 }
             }

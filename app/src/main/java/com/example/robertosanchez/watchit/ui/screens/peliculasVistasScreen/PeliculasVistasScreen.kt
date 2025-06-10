@@ -9,16 +9,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -48,26 +52,31 @@ import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.db.FirestoreManager
 import com.example.robertosanchez.watchit.db.PeliculasVistas.PeliculasVistas
 import com.example.robertosanchez.watchit.ui.shapes.CustomShape
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.robertosanchez.watchit.repositories.RemoteConnection
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun PeliculasVistasScreen (
+fun PeliculasVistasScreen(
     auth: AuthManager,
     firestore: FirestoreManager,
     navigateToDetail: (Int) -> Unit,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    userId: String? = null
 ) {
     val user = auth.getCurrentUser()
-    var peliculasVer by remember { mutableStateOf<List<PeliculasVistas>>(emptyList()) }
+    val peliculasVistasViewModel: PeliculasVistasViewModel = viewModel(
+        factory = PeliculasVistasViewModelFactory(firestore, auth)
+    )
+    val peliculasVistas by peliculasVistasViewModel.uiState.collectAsState()
 
-    LaunchedEffect(user) {
-        if (user != null) {
-            firestore.getVistas(user.uid).collect { peliculas ->
-                peliculasVer = peliculas
-            }
-        } else {
-            peliculasVer = emptyList()
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            peliculasVistasViewModel.loadVistasUsuario(userId)
+        } else if (user != null) {
+            peliculasVistasViewModel.loadVistas()
         }
     }
 
@@ -94,7 +103,7 @@ fun PeliculasVistasScreen (
                         }
 
                         Text(
-                            text = "Películas Vistas",
+                            text = if (userId != null) "Películas Vistas" else "Mis Películas Vistas",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.Black.copy(alpha = 0.8f)
@@ -141,7 +150,7 @@ fun PeliculasVistasScreen (
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (user?.isAnonymous == true) {
+            if (peliculasVistas.peliculas.isEmpty()) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -150,46 +159,28 @@ fun PeliculasVistasScreen (
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Inicia sesión para ver y guardar tus películas vistas",
+                        text = "No hay películas vistas",
                         fontSize = 18.sp,
                         color = Color.Gray,
                         textAlign = TextAlign.Center
                     )
                 }
             } else {
-                if (peliculasVer.isEmpty()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "No has visto ninguna película todavía",
-                            fontSize = 18.sp,
-                            color = Color.Gray,
-                            textAlign = TextAlign.Center
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(4),
+                    modifier = Modifier
+                        .padding(bottom = 15.dp)
+                ) {
+                    items(peliculasVistas.peliculas) { pelicula ->
+                        PeliculaItem(
+                            pelicula = pelicula,
+                            navigateToDetail = navigateToDetail
                         )
-                    }
-                } else {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(4),
-                        modifier = Modifier
-                            .padding(bottom = 15.dp)
-                    ) {
-                        items(peliculasVer) { pelicula ->
-                            PeliculaItem(
-                                pelicula,
-                                navigateToDetail
-                            )
-                        }
                     }
                 }
             }
         }
     }
-
 }
 
 @Composable
