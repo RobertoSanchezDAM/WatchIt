@@ -181,7 +181,8 @@ fun Navegacion(auth: AuthManager) {
                 firestore = firestoreManager,
                 navigateToDetail = { id ->
                     navController.navigate(Detail(id))
-                }
+                },
+                navigateBack = { navController.popBackStack() }
             )
         }
 
