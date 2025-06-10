@@ -43,6 +43,7 @@ import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.Pelic
 import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.PeliculasVistasViewModelFactory
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModel
 import com.example.robertosanchez.watchit.ui.screens.perfilScreen.PeliculasFavoritasViewModelFactory
+import com.example.robertosanchez.watchit.ui.screens.reviewsUsuarioScreen.ReviewsUsuarioScreen
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListScreen
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModel
 import com.example.robertosanchez.watchit.ui.screens.watchListScreen.WatchListViewModelFactory
@@ -133,7 +134,8 @@ fun Navegacion(auth: AuthManager) {
                 navigateToListaGenero = { navController.navigate(ListaGenero) },
                 navigateToProximosEstrenos = { navController.navigate(ProximosEstrenos) },
                 navigateToEnCine = { navController.navigate(EnCines) },
-                navigateToVistas = { navController.navigate(PeliculasVistas) }
+                navigateToVistas = { navController.navigate(PeliculasVistas) },
+                navigateToReviews = { navController.navigate(ReviewsUsuario) }
             )
         }
 
@@ -158,12 +160,23 @@ fun Navegacion(auth: AuthManager) {
                 navigateToDetail = { id ->
                     navController.navigate(Detail(id))
                 },
-                navigateToVistas = { navController.navigate(PeliculasVistas) }
+                navigateToVistas = { navController.navigate(PeliculasVistas) },
+                navigateToReviews = { navController.navigate(ReviewsUsuario) }
             )
         }
 
         composable<PeliculasVistas> {
             PeliculasVistasScreen(
+                auth = auth,
+                firestore = firestoreManager,
+                navigateToDetail = { id ->
+                    navController.navigate(Detail(id))
+                }
+            )
+        }
+
+        composable<ReviewsUsuario> {
+            ReviewsUsuarioScreen(
                 auth = auth,
                 firestore = firestoreManager,
                 navigateToDetail = { id ->

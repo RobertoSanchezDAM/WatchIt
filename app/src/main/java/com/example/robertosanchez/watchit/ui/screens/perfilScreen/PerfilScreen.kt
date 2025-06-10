@@ -1,7 +1,6 @@
 package com.example.robertosanchez.watchit.ui.screens.perfilScreen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,6 +31,7 @@ import com.example.robertosanchez.watchit.ui.shapes.CustomShape
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.PeliculasVistasViewModel
 import com.example.robertosanchez.watchit.ui.screens.peliculasVistasScreen.PeliculasVistasViewModelFactory
+import com.example.robertosanchez.watchit.ui.screens.reviewsUsuarioScreen.ReviewsUsuarioViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +40,8 @@ fun PerfilScreen(
     auth: AuthManager,
     firestore: FirestoreManager,
     navigateToDetail: (Int) -> Unit,
-    navigateToVistas: () -> Unit
+    navigateToVistas: () -> Unit,
+    navigateToReviews: () -> Unit
 ) {
     val user = auth.getCurrentUser()
     var peliculasFavoritas by remember { mutableStateOf<List<Pelicula>>(emptyList()) }
@@ -263,6 +264,46 @@ fun PerfilScreen(
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .clickable { navigateToVistas() }
+                                .padding(end = 8.dp)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Texto a la izquierda
+                Text(
+                    text = "Reviews",
+                    fontSize = 16.sp
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (user?.isAnonymous == true) {
+                        Text(
+                            text = "Inicia sesión para ver tus reviews",
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                        )
+                    } else {
+                        val reviewsUsuarioViewModel: ReviewsUsuarioViewModel = remember {
+                            ReviewsUsuarioViewModel(firestore, auth)
+                        }
+                        val reviewsState by reviewsUsuarioViewModel.uiState.collectAsState()
+                        
+                        Text(
+                            text = reviewsState.reviews.size.toString(),
+                            fontSize = 14.sp,
+                            modifier = Modifier
+                                .clickable { navigateToReviews() }
                                 .padding(end = 8.dp)
                         )
                     }

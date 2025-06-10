@@ -27,6 +27,9 @@ object Perfil
 object PeliculasVistas
 
 @Serializable
+object ReviewsUsuario
+
+@Serializable
 data class Detail(val id: Int)
 
 @Serializable

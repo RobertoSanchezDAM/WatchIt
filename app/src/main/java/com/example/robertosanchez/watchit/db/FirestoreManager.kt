@@ -5,6 +5,7 @@ import com.example.robertosanchez.watchit.data.AuthManager
 import com.example.robertosanchez.watchit.db.Pelicula.Pelicula
 import com.example.robertosanchez.watchit.db.PeliculasVistas.PeliculasVistas
 import com.example.robertosanchez.watchit.db.Usuario.UsuarioDB
+import com.example.robertosanchez.watchit.repositories.models.Review
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
 import kotlinx.coroutines.flow.Flow
@@ -79,6 +80,18 @@ class FirestoreManager(auth: AuthManager, context: Context) {
             .document(movieId.toString())
             .update("estrellas", rating)
             .await()
+    }
+
+    // Reviews
+    fun getUserReviews(userId: String): Flow<List<Review>> {
+        return firestore.collection("reviews")
+            .whereEqualTo("userId", userId)
+            .snapshots()
+            .map { querySnapshot ->
+                querySnapshot.documents.mapNotNull { doc ->
+                    doc.toObject(Review::class.java)?.copy(id = doc.id)
+                }.sortedByDescending { it.timestamp }
+            }
     }
 }
 
