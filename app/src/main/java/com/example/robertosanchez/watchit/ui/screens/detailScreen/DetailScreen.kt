@@ -71,6 +71,9 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import com.example.robertosanchez.watchit.repositories.models.Review
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "NewApi")
@@ -1047,8 +1050,8 @@ fun ReviewItem(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
-                                .format(java.util.Date(review.timestamp)),
+                            text = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                                .format(Date(review.timestamp)),
                             color = Color.Gray,
                             fontSize = 12.sp
                         )
@@ -1068,6 +1071,32 @@ fun ReviewItem(
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "Editar review",
+                                tint = Color.LightGray,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        IconButton(
+                            onClick = {
+                                reviewsViewModel.deleteReview(
+                                    onSuccess = {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Review eliminada con éxito")
+                                        }
+                                    },
+                                    onError = { error ->
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(error)
+                                        }
+                                    },
+                                    reviewId = review.id,
+                                    movieId = review.movieId
+                                )
+                            },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Eliminar review",
                                 tint = Color.LightGray,
                                 modifier = Modifier.size(20.dp)
                             )
