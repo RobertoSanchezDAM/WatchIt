@@ -66,6 +66,8 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import com.example.robertosanchez.watchit.repositories.models.Review
 
@@ -91,6 +93,7 @@ fun DetailScreen(
     val reviews by reviewsViewModel.reviews.observeAsState(emptyList())
 
     var reviewText by remember { mutableStateOf("") }
+    var editingReview by remember { mutableStateOf<Review?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     val isFavorita = peliculasFavoritasViewModel.isFavorita(id)
@@ -256,7 +259,7 @@ fun DetailScreen(
                     .clip(CustomShape())
             )
         }
-    ) {
+    ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -709,7 +712,10 @@ fun DetailScreen(
                             modifier = Modifier
                                 .align(Alignment.End)
                                 .padding(bottom = 16.dp),
-                            enabled = reviewText.isNotBlank()
+                            enabled = reviewText.isNotBlank(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF3B82F6)
+                            )
                         ) {
                             Text("Enviar Review")
                         }
@@ -733,7 +739,11 @@ fun DetailScreen(
                         )
                     } else {
                         reviews.forEach { review ->
-                            ReviewItem(review = review)
+                            ReviewItem(
+                                review = review,
+                                auth = auth,
+                                snackbarHostState = snackbarHostState
+                            )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
@@ -959,8 +969,19 @@ fun VideosSection(videos: MovieVideosResponse?) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReviewItem(review: Review) {
+fun ReviewItem(
+    review: Review,
+    auth: AuthManager,
+    snackbarHostState: SnackbarHostState
+) {
+    val scope = rememberCoroutineScope()
+    val reviewsViewModel: DetailReviewsViewModel = viewModel()
+    val user = auth.getCurrentUser()
+    var isEditing by remember { mutableStateOf(false) }
+    var editedText by remember { mutableStateOf(review.text) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -976,61 +997,163 @@ fun ReviewItem(review: Review) {
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Foto de perfil
-                if (review.userPhotoUrl != null) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(review.userPhotoUrl)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = "Foto de perfil",
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray),
-                        contentAlignment = Alignment.Center
-                    ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Foto de perfil
+                    if (review.userPhotoUrl != null) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(review.userPhotoUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Foto de perfil",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(Color.Gray),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = review.userName.first().toString(),
+                                color = Color.White,
+                                fontSize = 20.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column {
                         Text(
-                            text = review.userName.first().toString(),
+                            text = review.userName,
                             color = Color.White,
-                            fontSize = 20.sp
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
+                                .format(java.util.Date(review.timestamp)),
+                            color = Color.Gray,
+                            fontSize = 12.sp
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column {
-                    Text(
-                        text = review.userName,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
-                            .format(java.util.Date(review.timestamp)),
-                        color = Color.Gray,
-                        fontSize = 12.sp
-                    )
+                // Botones de editar y eliminar (solo para el autor de la review)
+                if (user?.uid == review.userId) {
+                    Row {
+                        IconButton(
+                            onClick = {
+                                isEditing = true
+                                editedText = review.text
+                            },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Editar review",
+                                tint = Color.LightGray,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        IconButton(
+                            onClick = {
+                                reviewsViewModel.deleteReview(
+                                    reviewId = review.id,
+                                    movieId = review.movieId,
+                                    onSuccess = {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Review eliminada con éxito")
+                                        }
+                                    },
+                                    onError = { error ->
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(error)
+                                        }
+                                    }
+                                )
+                            },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Eliminar review",
+                                tint = Color.LightGray,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = review.text,
-                color = Color.White,
-                fontSize = 14.sp
-            )
+            if (isEditing) {
+                OutlinedTextField(
+                    value = editedText,
+                    onValueChange = { editedText = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = Color.White,
+                        focusedBorderColor = Color.White,
+                        unfocusedBorderColor = Color.Gray
+                    ),
+                    maxLines = 3
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(
+                        onClick = {
+                            isEditing = false
+                            editedText = review.text
+                        }
+                    ) {
+                        Text("Cancelar", color = Color.Gray)
+                    }
+                    TextButton(
+                        onClick = {
+                            reviewsViewModel.updateReview(
+                                review = review.copy(text = editedText),
+                                onSuccess = {
+                                    isEditing = false
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Review editada")
+                                    }
+                                },
+                                onError = { error ->
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(error)
+                                    }
+                                }
+                            )
+                        }
+                    ) {
+                        Text("Guardar", color = Color.White)
+                    }
+                }
+            } else {
+                Text(
+                    text = review.text,
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+            }
         }
     }
 }

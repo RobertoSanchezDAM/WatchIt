@@ -55,4 +55,32 @@ class DetailReviewsViewModel : ViewModel() {
             }
         }
     }
+
+    fun deleteReview(reviewId: String, movieId: Int, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                Log.d("DetailReviewsViewModel", "Eliminando review: $reviewId")
+                reviewsCollection.document(reviewId).delete().await()
+                loadReviews(movieId)
+                onSuccess()
+            } catch (e: Exception) {
+                Log.e("DetailReviewsViewModel", "Error al eliminar review: ${e.message}", e)
+                onError(e.message ?: "Error al eliminar la review")
+            }
+        }
+    }
+
+    fun updateReview(review: Review, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                Log.d("DetailReviewsViewModel", "Actualizando review: ${review.id}")
+                reviewsCollection.document(review.id).set(review).await()
+                loadReviews(review.movieId)
+                onSuccess()
+            } catch (e: Exception) {
+                Log.e("DetailReviewsViewModel", "Error al actualizar review: ${e.message}", e)
+                onError(e.message ?: "Error al actualizar la review")
+            }
+        }
+    }
 } 
