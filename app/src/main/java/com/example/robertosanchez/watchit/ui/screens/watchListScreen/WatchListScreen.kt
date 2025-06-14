@@ -138,6 +138,21 @@ fun WatchListScreen(
                         textAlign = TextAlign.Center
                     )
                 }
+            } else if (peliculasVer.isEmpty() ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "No hay películas para ver",
+                        fontSize = 18.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                }
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(4),
