@@ -20,9 +20,13 @@ import kotlinx.coroutines.tasks.await
 class AuthManager(private val context: Context) {
     private val auth: FirebaseAuth by lazy { Firebase.auth }
 
-    suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthRes<FirebaseUser?> {
+    suspend fun createUserWithEmailAndPassword(email: String, password: String, username: String): AuthRes<FirebaseUser?> {
         return try {
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+            val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                .setDisplayName(username)
+                .build()
+            authResult.user?.updateProfile(profileUpdates)?.await()
             AuthRes.Success(authResult.user)
         } catch (e: Exception) {
             AuthRes.Error(e.message ?: "Error al crear el usuario")

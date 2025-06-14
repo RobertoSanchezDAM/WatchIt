@@ -17,8 +17,8 @@ class FirestoreManager(auth: AuthManager, context: Context) {
     private val userId = auth.getCurrentUser()?.uid
 
     // Usuarios
-    suspend fun guardarUsuario(uid: String) {
-        val userDocument = UsuarioDB(userId = uid)
+    suspend fun guardarUsuario(uid: String, username: String = "") {
+        val userDocument = UsuarioDB(userId = uid, username = username)
         firestore.collection("usuarios").document(uid).set(userDocument).await()
     }
 

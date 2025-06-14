@@ -53,6 +53,7 @@ import kotlinx.coroutines.withContext
 fun RegistroScreen(auth: AuthManager, firestoreManager: FirestoreManager, navigateToHome: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -118,6 +119,16 @@ fun RegistroScreen(auth: AuthManager, firestoreManager: FirestoreManager, naviga
                 Spacer(modifier = Modifier.height(36.dp))
 
                 TextField(
+                    value = username,
+                    onValueChange = { username = it },
+                    label = { Text("Nombre de Usuario") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(5.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextField(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Correo Electrónico") },
@@ -143,7 +154,7 @@ fun RegistroScreen(auth: AuthManager, firestoreManager: FirestoreManager, naviga
                 Button(
                     onClick = {
                         scope.launch {
-                            signUp(navigateToHome, auth, email, password, context, firestoreManager)
+                            signUp(navigateToHome, auth, email, password, username, context, firestoreManager)
                         }
                     },
                     modifier = Modifier
@@ -189,18 +200,19 @@ suspend fun signUp(
     auth: AuthManager,
     email: String,
     password: String,
+    username: String,
     context: Context,
     firestoreManager: FirestoreManager
 ) {
-    if (email.isNotEmpty() && password.isNotEmpty()) {
+    if (email.isNotEmpty() && password.isNotEmpty() && username.isNotEmpty()) {
         when (
             val result = withContext(Dispatchers.IO) {
-                auth.createUserWithEmailAndPassword(email, password)
+                auth.createUserWithEmailAndPassword(email, password, username)
             }
         ) {
             is AuthRes.Success -> {
                 result.data?.uid?.let {
-                    firestoreManager.guardarUsuario(it)
+                    firestoreManager.guardarUsuario(it, username)
                 }
                 Toast.makeText(context, "Usuario creado", Toast.LENGTH_SHORT).show()
                 navigateToHome()
