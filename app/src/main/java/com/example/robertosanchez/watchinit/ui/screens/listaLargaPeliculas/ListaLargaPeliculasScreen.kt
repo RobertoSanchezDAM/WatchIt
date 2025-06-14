@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -58,6 +59,7 @@ fun ListaLargaPeliculasScreen(
     navigateToDetail: (Int) -> Unit,
     auth: AuthManager,
     navigateBack: () -> Unit,
+    navigateToPrincipal: () -> Unit
 ) {
     val user = auth.getCurrentUser()
 
@@ -134,6 +136,20 @@ fun ListaLargaPeliculasScreen(
                     .height(56.dp)
                     .clip(CustomShape())
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = navigateToPrincipal,
+                containerColor = Color(0xFF3B82F6),
+                contentColor = Color.White,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Home,
+                    contentDescription = "Ir a inicio",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {

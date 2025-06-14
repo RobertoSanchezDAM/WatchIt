@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -58,7 +59,8 @@ fun PeliculasVistasScreen(
     firestore: FirestoreManager,
     navigateToDetail: (Int) -> Unit,
     navigateBack: () -> Unit,
-    userId: String? = null
+    userId: String? = null,
+    navigateToPrincipal: () -> Unit
 ) {
     val user = auth.getCurrentUser()
     val peliculasVistasViewModel: PeliculasVistasViewModel = viewModel(
@@ -137,6 +139,20 @@ fun PeliculasVistasScreen(
                     .height(56.dp)
                     .clip(CustomShape())
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = navigateToPrincipal,
+                containerColor = Color(0xFF3B82F6),
+                contentColor = Color.White,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Home,
+                    contentDescription = "Ir a inicio",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     ) { paddingValues ->
         Box(

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
@@ -89,7 +90,8 @@ fun DetailScreen(
     peliculasVistasViewModel: PeliculasVistasViewModel,
     navigateBack: () -> Unit,
     auth: AuthManager,
-    navigateToPerfilUsuario: (String, String, String?) -> Unit
+    navigateToPerfilUsuario: (String, String, String?) -> Unit,
+    navigateToPrincipal: () -> Unit
 ) {
     val user = auth.getCurrentUser()
     val scope = rememberCoroutineScope()
@@ -262,6 +264,20 @@ fun DetailScreen(
                     .height(56.dp)
                     .clip(CustomShape())
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = navigateToPrincipal,
+                containerColor = Color(0xFF3B82F6),
+                contentColor = Color.White,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Home,
+                    contentDescription = "Ir a inicio",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     ) { paddingValues ->
         LazyColumn(

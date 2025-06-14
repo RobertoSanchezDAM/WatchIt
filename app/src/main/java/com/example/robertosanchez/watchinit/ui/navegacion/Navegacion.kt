@@ -153,6 +153,7 @@ fun Navegacion(auth: AuthManager) {
                 },
                 auth = auth,
                 navigateBack = { navController.popBackStack() },
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
 
@@ -176,6 +177,7 @@ fun Navegacion(auth: AuthManager) {
                     navController.navigate(Detail(id))
                 },
                 navigateBack = { navController.popBackStack() },
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
 
@@ -186,7 +188,8 @@ fun Navegacion(auth: AuthManager) {
                 navigateToDetail = { id ->
                     navController.navigate(Detail(id))
                 },
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
 
@@ -206,7 +209,8 @@ fun Navegacion(auth: AuthManager) {
                 peliculasVistasViewModel = peliculasVistasViewModel,
                 navigateToPerfilUsuario = { userId, userName, userPhotoUrl ->
                     navController.navigate(PerfilUsuarioSelect(userId, userName, userPhotoUrl))
-                }
+                },
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
 
@@ -247,6 +251,7 @@ fun Navegacion(auth: AuthManager) {
                     navController.navigate(Detail(id))
                 },
                 navigateBack = { navController.popBackStack() },
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
 
@@ -283,6 +288,7 @@ fun Navegacion(auth: AuthManager) {
                 viewModel = generoViewModel,
                 navigateToDetail = { id -> navController.navigate(Detail(id)) },
                 navigateBack = { navController.popBackStack() },
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
 
@@ -299,6 +305,7 @@ fun Navegacion(auth: AuthManager) {
                 viewModel = fechaViewModel,
                 navigateToDetail = { id -> navController.navigate(Detail(id)) },
                 navigateBack = { navController.popBackStack() },
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
 
@@ -308,6 +315,7 @@ fun Navegacion(auth: AuthManager) {
                 auth = auth,
                 navigateToDetail = { id -> navController.navigate(Detail(id)) },
                 navigateBack = { navController.popBackStack() },
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
 
@@ -317,6 +325,7 @@ fun Navegacion(auth: AuthManager) {
                 auth = auth,
                 navigateToDetail = { id -> navController.navigate(Detail(id)) },
                 navigateBack = { navController.popBackStack() },
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
 
@@ -336,7 +345,8 @@ fun Navegacion(auth: AuthManager) {
                 },
                 navigateBack = { navController.popBackStack() },
                 navigateToVistas = { navController.navigate("peliculas_vistas/$userId") },
-                navigateToReviews = { navController.navigate("reviews_usuario/$userId") }
+                navigateToReviews = { navController.navigate("reviews_usuario/$userId") },
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
 
@@ -352,7 +362,8 @@ fun Navegacion(auth: AuthManager) {
                     navController.navigate(Detail(id))
                 },
                 navigateBack = { navController.popBackStack() },
-                userId = userId
+                userId = userId,
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
 
@@ -368,7 +379,8 @@ fun Navegacion(auth: AuthManager) {
                     navController.navigate(Detail(id))
                 },
                 navigateBack = { navController.popBackStack() },
-                userId = userId
+                userId = userId,
+                navigateToPrincipal = { navController.navigate(Principal) }
             )
         }
     }

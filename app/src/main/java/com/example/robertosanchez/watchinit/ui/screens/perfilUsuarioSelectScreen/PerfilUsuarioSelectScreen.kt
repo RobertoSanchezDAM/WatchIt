@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -47,7 +48,8 @@ fun PerfilUsuarioSelectScreen(
     navigateToDetail: (Int) -> Unit,
     navigateBack: () -> Unit,
     navigateToVistas: () -> Unit,
-    navigateToReviews: () -> Unit
+    navigateToReviews: () -> Unit,
+    navigateToPrincipal: () -> Unit
 ) {
     val user = auth.getCurrentUser()
 
@@ -127,6 +129,20 @@ fun PerfilUsuarioSelectScreen(
                     .height(56.dp)
                     .clip(CustomShape())
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = navigateToPrincipal,
+                containerColor = Color(0xFF3B82F6),
+                contentColor = Color.White,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Home,
+                    contentDescription = "Ir a inicio",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     ) {
         Column(

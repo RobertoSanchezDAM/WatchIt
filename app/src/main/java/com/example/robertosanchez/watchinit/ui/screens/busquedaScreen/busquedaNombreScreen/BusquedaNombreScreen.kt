@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -48,6 +49,7 @@ fun BusquedaNombreScreen(
     auth: AuthManager,
     navigateToDetail: (Int) -> Unit,
     navigateBack: () -> Unit,
+    navigateToPrincipal: () -> Unit
 ) {
     val user = auth.getCurrentUser()
 
@@ -117,6 +119,20 @@ fun BusquedaNombreScreen(
                     .height(56.dp)
                     .clip(CustomShape())
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = navigateToPrincipal,
+                containerColor = Color(0xFF3B82F6),
+                contentColor = Color.White,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Home,
+                    contentDescription = "Ir a inicio",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
