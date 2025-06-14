@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -47,10 +48,16 @@ import com.example.robertosanchez.watchinit.db.FirestoreManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.ui.zIndex
 
 @Composable
-fun RegistroScreen(auth: AuthManager, firestoreManager: FirestoreManager, navigateToHome: () -> Unit) {
+fun RegistroScreen(
+    auth: AuthManager, 
+    firestoreManager: FirestoreManager, 
+    navigateToHome: () -> Unit
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
@@ -65,6 +72,19 @@ fun RegistroScreen(auth: AuthManager, firestoreManager: FirestoreManager, naviga
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
+        )
+
+        // Botón de retroceso
+        Icon(
+            imageVector = Icons.Default.ArrowBack,
+            contentDescription = "Volver atrás",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+                .size(24.dp)
+                .zIndex(1001F)
+                .clickable { navigateToHome() },
+            tint = Color.White
         )
 
         // Contenido de la pantalla
@@ -116,7 +136,7 @@ fun RegistroScreen(auth: AuthManager, firestoreManager: FirestoreManager, naviga
                     .offset(y = (-32).dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(36.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 TextField(
                     value = username,

@@ -99,21 +99,23 @@ fun Navegacion(auth: AuthManager) {
                         popUpTo(Login) { inclusive = true }
                     }
                 },
-                { navController.navigate(ContraseñaOlv) }
+                { navController.navigate(ContraseñaOlv) },
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
         composable<Registro> {
             RegistroScreen(
                 auth,
-                firestoreManager
+                firestoreManager,
             ) { navController.popBackStack() }
         }
 
         composable<ContraseñaOlv> {
             ContrasenaOlvScreen(
                 auth,
-                { navController.navigate(Login) }
+                { navController.navigate(Login) },
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 

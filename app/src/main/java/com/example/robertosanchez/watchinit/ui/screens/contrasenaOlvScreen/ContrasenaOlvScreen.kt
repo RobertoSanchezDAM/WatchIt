@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -43,9 +45,12 @@ import com.example.robertosanchez.watchinit.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.ui.zIndex
 
 @Composable
-fun ContrasenaOlvScreen(auth: AuthManager, navigateToLogin: () -> Unit) {
+fun ContrasenaOlvScreen(auth: AuthManager, navigateToLogin: () -> Unit, onNavigateBack: () -> Unit) {
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
 
@@ -58,6 +63,19 @@ fun ContrasenaOlvScreen(auth: AuthManager, navigateToLogin: () -> Unit) {
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
+        )
+
+        // Botón de retroceso
+        Icon(
+            imageVector = Icons.Default.ArrowBack,
+            contentDescription = "Volver atrás",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+                .size(24.dp)
+                .zIndex(1001F)
+                .clickable { onNavigateBack() },
+            tint = Color.White
         )
 
         // Contenido de la pantalla

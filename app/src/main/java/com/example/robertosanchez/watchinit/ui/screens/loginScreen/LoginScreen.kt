@@ -55,6 +55,9 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.ui.zIndex
 
 @Composable
 fun LoginScreen(
@@ -63,6 +66,7 @@ fun LoginScreen(
     navigateToSignUp: () -> Unit,
     navigateToPrincipal: () -> Unit,
     navigateToContraseñaOlv: () -> Unit,
+    onNavigateBack: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -115,6 +119,19 @@ fun LoginScreen(
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
+        )
+
+        // Botón de retroceso
+        Icon(
+            imageVector = Icons.Default.ArrowBack,
+            contentDescription = "Volver atrás",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+                .size(24.dp)
+                .zIndex(1001F)
+                .clickable { onNavigateBack() },
+            tint = Color.White
         )
 
         // Contenido de la pantalla
