@@ -100,7 +100,7 @@ fun Navegacion(auth: AuthManager) {
                     }
                 },
                 { navController.navigate(ContraseñaOlv) },
-                onNavigateBack = { navController.popBackStack() }
+                { navController.navigate(Inicio) }
             )
         }
 
