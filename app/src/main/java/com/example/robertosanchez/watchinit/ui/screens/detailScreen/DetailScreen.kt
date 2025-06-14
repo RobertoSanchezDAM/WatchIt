@@ -1,6 +1,8 @@
 package com.example.robertosanchez.watchinit.ui.screens.detailScreen
 
 import android.annotation.SuppressLint
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -66,6 +68,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.ui.viewinterop.AndroidView
 import com.example.robertosanchez.watchinit.repositories.models.Review
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -606,8 +609,61 @@ fun DetailScreen(
                                     CastSeccion(castList)
                                 }
 
-                               Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(16.dp))
 
+                                Divider(
+                                    color = Color.Gray.copy(alpha = 0.3f),
+                                    thickness = 1.dp,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                // Sección del tráiler
+                                videos?.let { videoResponse ->
+                                    val trailer = videoResponse.results.find { it.type == "Trailer" && it.site == "YouTube" }
+                                    if (trailer != null) {
+                                        Text(
+                                            text = "Tráiler",
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp,
+                                            modifier = Modifier.padding(bottom = 8.dp)
+                                        )
+                                        
+                                        AndroidView(
+                                            factory = { context ->
+                                                WebView(context).apply {
+                                                    settings.javaScriptEnabled = true
+                                                    webViewClient = WebViewClient()
+                                                    loadData(
+                                                        """
+                                                        <html>
+                                                            <body style="margin:0;padding:0;">
+                                                                <iframe 
+                                                                    width="100%" 
+                                                                    height="200" 
+                                                                    src="https://www.youtube.com/embed/${trailer.key}" 
+                                                                    frameborder="0" 
+                                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                                    allowfullscreen>
+                                                                </iframe>
+                                                            </body>
+                                                        </html>
+                                                        """.trimIndent(),
+                                                        "text/html",
+                                                        "utf-8"
+                                                    )
+                                                }
+                                            },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(200.dp)
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(16.dp))
 
                                 Divider(
                                     color = Color.Gray.copy(alpha = 0.3f),
@@ -935,40 +991,7 @@ fun PlataformasSeccion(plataformas: WatchProviders?) {
 
 @Composable
 fun VideosSection(videos: MovieVideosResponse?) {
-    val trailer = videos?.results?.find { it.type == "Trailer" && it.site == "YouTube" }
-    val context = LocalContext.current
-    
-    if (trailer != null) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Button(
-                onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=${trailer.key}"))
-                    context.startActivity(intent)
-                },
-                modifier = Modifier
-                    .width(145.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF3B82F6)
-                )
-            ) {
-                Row {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Play",
-                        tint = Color.White
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Ver Tráiler",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-    }
+    // Esta función ya no se usa, pero la mantenemos por si se necesita en el futuro
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
