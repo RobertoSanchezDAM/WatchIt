@@ -1,10 +1,34 @@
-# WatchIt
+# 🎬 WatchIt
 
-La aplicación WatchIt es una plataforma móvil diseñada para entusiastas del cine que buscan una experiencia personalizada en la gestión y descubrimiento de películas.
+**WatchIt** es una aplicación móvil diseñada para los amantes del cine que desean una experiencia personalizada para descubrir, gestionar y valorar películas.  
+¡Encuentra lo que verás esta noche y lleva un control de todo lo que ya has visto!
 
-Usuarios para el testing:
-- Google (cualquiera)
-- Incognito
-- Usuarios ya creados:
-    - Usuario: admin@watchit.com
-    - Contraseña: admin1234
+---
+
+## 🚀 Funcionalidades destacadas
+
+- 📌 Listado personalizado de películas vistas y por ver  
+- ⭐ Valoraciones y reseñas personales  
+- 🔍 Información detallada de cada película (actores, duración, año, sinopsis)  
+- 🧠 Descubre películas según tus gustos
+
+---
+
+## 👤 Acceso para Testing
+
+Puedes usar cualquiera de estas opciones para probar la app:
+
+- 🟢 Iniciar sesión con **Google**
+- 🕶️ Navegación en **modo incógnito**
+- 🔐 Cuentas de prueba ya creadas:
+
+| Usuario                  | Contraseña   |
+|--------------------------|--------------|
+| admin@watchit.com        | admin1234    |
+
+---
+
+## 🛠️ Repositorio en GitHub
+
+📂 Puedes encontrar el código fuente del proyecto aquí:  
+👉 [https://github.com/RobertoSanchezDAM/WatchIt](https://github.com/RobertoSanchezDAM/WatchIt)
