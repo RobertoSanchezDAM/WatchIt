@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -78,14 +79,23 @@ fun InicioScreen(onNavigateToLogin: () -> Unit) {
                     Spacer(modifier = Modifier.height(36.dp))
 
                     Text(
-                        text = "Bienvenido/a a WatchinIt!",
+                        text = "Bienvenido/a a",
                         color = Color.White,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
 
-                    Spacer(modifier = Modifier.height(36.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.titulo),
+                        contentDescription = "Titulo",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 32.dp),
+                        contentScale = ContentScale.FillWidth
+                    )
+
+                    Spacer(modifier = Modifier.height(25.dp))
 
                     Button(
                         onClick = onNavigateToLogin,
