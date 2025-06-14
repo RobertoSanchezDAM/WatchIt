@@ -11,13 +11,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_watchit_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.WatchIt"
+        android:theme="@style/Theme.WatchinIt"
         tools:targetApi="31">
         <activity
-            android:name="com.example.robertosanchez.watchit.MainActivity"
+            android:name="com.example.robertosanchez.watchinit.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.WatchIt">
+            android:theme="@style/Theme.WatchinIt">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

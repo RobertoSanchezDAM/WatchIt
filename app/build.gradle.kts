@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.robertosanchez.watchit"
+    namespace = "com.example.robertosanchez.watchinit"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.robertosanchez.watchit"
+        applicationId = "com.example.robertosanchez.watchinit"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
