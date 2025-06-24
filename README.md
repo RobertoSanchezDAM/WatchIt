@@ -20,11 +20,7 @@ Puedes usar cualquiera de estas opciones para probar la app:
 
 - 🟢 Iniciar sesión con **Google**
 - 🕶️ Navegación en **modo incógnito**
-- 🔐 Cuentas de prueba ya creadas:
-
-| Usuario                  | Contraseña   |
-|--------------------------|--------------|
-| admin@watchinit.com     | admin1234    |
+- 🔐 **Creación de cuentas**
 
 ---
 
